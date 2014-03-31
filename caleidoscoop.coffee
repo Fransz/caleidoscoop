@@ -3,9 +3,9 @@
 # @see http://math.stackexchange.com/questions/525082/reflection-across-a-line
 drawing = Snap("#drawing")
 
-center = {x: 300, y: 300}
 
-rect = drawing.rect(0, 0, 600, 600).attr({fill: "black", stroke: "green"})
+#
+# reference forms, for testing
 tree = drawing.group()
 tree.add(drawing.line(-Math.sqrt(2) * 15, -Math.sqrt(2) * 15, 0, 0).attr({"stroke": "red", "stroke-width": "2px"}))
 tree.add(drawing.line(0, 0, -15, 0).attr({"stroke": "yellow", "stroke-width": "2px"}))
@@ -19,40 +19,56 @@ reference = drawing.group().attr({id: "reference"})
 reference.add(bunch)
 reference.toDefs()
 
+# Use a reference defenition element in a group, on given coordinates
+addReference = (x, y, g) -> g.add( drawing.use().attr("xlink:href": "#reference").transform("t#{x},#{y}") )
+
+# center of our drawing.
+center = {x: 300, y: 300}
+
+# our viewport
+rect = drawing.rect(0, 0, 600, 600).attr({fill: "black", stroke: "green"})
+
+# clipping cone.
 coneRadius = 300
 coneAngle = Math.PI / 3
-# coneStart = {x: coneRadius * Math.cos(coneAngle / 2), y: -coneRadius * Math.sin(coneAngle / 2)}
-# coneEnd = {x: coneRadius * Math.cos(coneAngle / 2), y: coneRadius * Math.sin(coneAngle / 2)}
 coneStart = {x: coneRadius, y: 0}
 coneEnd = {x: coneRadius * Math.cos(coneAngle), y: coneRadius * Math.sin(coneAngle)}
-
-# cone = drawing.path().L(coneEnd).A(coneRadius, coneRadius, 0, 0, 0, coneStart).fill("yellow")
 coneString = "M 0 0 L #{coneEnd.x} #{coneEnd.y} A #{coneRadius} #{coneRadius} 0 0 0 #{coneStart.x} #{coneStart.y}"
 cone = drawing.path(coneString).attr({id: "cone", fill: "yellow"})
 # cone.toDefs()
 # cone.translate(coneCenter.x, coneCenter.y)
 
+# Function for making mirrors under an angle.
+#
+# @param k  slope of the mirror (tangens of angle with x-axis).
+# @return   Snap.Matrix
 makeMirror = (k) ->
+
     mirror = (k) ->
         f = 1 / (k * k + 1)
         new Snap.Matrix(f * (1 - k * k),  f * 2 * k,  f * 2 * k,  f * (k * k - 1),  0,  0)
         
     t = new Snap.Matrix()
-    # t.translate(center.x, center.y).add(mirror(k))
     t.add(mirror(k))
 
-# mirrors = (makeMirror k for k in [-Math.sqrt(3), 0])
 mirrors = (makeMirror k for k in [-Math.sqrt(3), Math.sqrt(3), 0])
 
+# transformation strings for the caleidoscope chambers, from the three mirrors
+beadTransforms = [
+            new Snap.Matrix(1, 0, 0, 1, 0, 0),
+            mirrors[0].clone(),
+            mirrors[0].clone().add(mirrors[1]),
+            mirrors[0].clone().add(mirrors[1]).add(mirrors[2]),
+            mirrors[0].clone().add(mirrors[1]).add(mirrors[2]).add(mirrors[0]),
+            mirrors[0].clone().add(mirrors[1]).add(mirrors[2]).add(mirrors[0]).add(mirrors[1])
+]
 
-tt = (x, y, g) -> g.add( drawing.use().attr("xlink:href": "#reference").transform("t#{x},#{y}") )
-addBeads = (g) -> tt(x * 40, y * 40, g) for y in [0..1] for x in [0..1]
-
-# addBeads = (g) -> g.add( drawing.use().attr("xlink:href": "#reference"))
 
 
-beadsGroup = drawing.group()
+addBeads = (g) -> addReference(x * 40, y * 40, g) for y in [0..1] for x in [0..1]
+beadsGroup = drawing.group().attr({id: "beads"})
 addBeads(beadsGroup)
+
 # beadsGroup.attr({clipPath: cone})
 # console.log drawing.toString()
 
