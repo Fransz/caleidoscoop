@@ -1,7 +1,10 @@
 body {
+    width:100%;
     background-color: black;
 }
 
-#drawing {
-    width: 800px;
+#canvas {
+    margin:0 auto;
+    padding:100px 0 0 0;
+    width: 600px;
 }

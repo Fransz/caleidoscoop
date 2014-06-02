@@ -47,7 +47,8 @@ beads = [circleForm, triangleForm, squareForm, diamondForm, starForm, wingForm]
 center = {x: 300, y: 300}
 
 # our viewport
-rect = drawing.rect(0, 0, 600, 600).attr({fill: "black", stroke: "green"})
+rect = drawing.rect(0, 0, 600, 600).attr({fill: "black"})
+# drawing.circle(300, 300, 300, 300).attr({fill: "hsb(.71, 1, .58)"})
 
 
 # clipping cone.
@@ -118,30 +119,30 @@ beadsAnimations = ({transform: t + "r360,0,0"} for t in beadTransforms)
 # 6 chambers.
 chamber0 = drawing.group().transform("t #{center.x}, #{center.y}")
 chamber0.add(transformedBeads[0])
-chamber0.attr({clipPath: cone.clone(), fill: "hsb(0.5, 0.75, 1)"})
+chamber0.attr({clipPath: cone.clone()})
 transformedBeads[0].animate(beadsAnimations[0], 8000, mina.lineair)
 
 chamber1 = drawing.group().transform("t #{center.x}, #{center.y}")
 chamber1.add(transformedBeads[1])
-chamber1.attr({clipPath: cone.clone().transform(beadTransforms[1]), fill: "hsb(0.5, 0.75, 1)"})
+chamber1.attr({clipPath: cone.clone().transform(beadTransforms[1])})
 transformedBeads[1].animate(beadsAnimations[1], 8000, mina.lineair)
 
 chamber2 = drawing.group().transform("t #{center.x}, #{center.y}")
 chamber2.add(transformedBeads[2])
-chamber2.attr({clipPath: cone.clone().transform(beadTransforms[2]), fill: "hsb(0.5, 0.75, 1)"})
+chamber2.attr({clipPath: cone.clone().transform(beadTransforms[2])})
 transformedBeads[2].animate(beadsAnimations[2], 8000, mina.lineair)
 
 chamber3 = drawing.group().transform("t #{center.x}, #{center.y}")
 chamber3.add(transformedBeads[3])
-chamber3.attr({clipPath: cone.clone().transform(beadTransforms[3]), fill: "hsb(0.5, 0.75, 1)"})
+chamber3.attr({clipPath: cone.clone().transform(beadTransforms[3])})
 transformedBeads[3].animate(beadsAnimations[3], 8000, mina.lineair)
 
 chamber4 = drawing.group().transform("t #{center.x}, #{center.y}")
 chamber4.add(transformedBeads[4])
-chamber4.attr({clipPath: cone.clone().transform(beadTransforms[4]), fill: "hsb(0.5, 0.75, 1)"})
+chamber4.attr({clipPath: cone.clone().transform(beadTransforms[4])})
 transformedBeads[4].animate(beadsAnimations[4], 8000, mina.lineair)
 
 chamber5 = drawing.group().transform("t #{center.x}, #{center.y}")
 chamber5.add(transformedBeads[5])
-chamber5.attr({clipPath: cone.clone().transform(beadTransforms[5]), fill: "hsb(0.5, 0.75, 1)"})
+chamber5.attr({clipPath: cone.clone().transform(beadTransforms[5])})
 transformedBeads[5].animate(beadsAnimations[5], 8000, mina.lineair)
