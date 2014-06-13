@@ -6,18 +6,18 @@ drawing = Snap("#drawing")
 
 #
 # reference forms, for testing
-tree = drawing.group()
-tree.add(drawing.line(-Math.sqrt(2) * 15, -Math.sqrt(2) * 15, 0, 0).attr({"stroke": "red", "stroke-width": "2px"}))
-tree.add(drawing.line(0, 0, -15, 0).attr({"stroke": "yellow", "stroke-width": "2px"}))
-tree.add(drawing.line(0, 0, 0, -15).attr({"stroke": "green", "stroke-width": "2px"}))
+# tree = drawing.group()
+# tree.add(drawing.line(-Math.sqrt(2) * 15, -Math.sqrt(2) * 15, 0, 0).attr({"stroke": "red", "stroke-width": "2px"}))
+# tree.add(drawing.line(0, 0, -15, 0).attr({"stroke": "yellow", "stroke-width": "2px"}))
+# tree.add(drawing.line(0, 0, 0, -15).attr({"stroke": "green", "stroke-width": "2px"}))
 
-bunch = drawing.group()
-bunch.add(drawing.circle(20, 20, 20)).attr({fill: "red", stroke: "blue"})
-bunch.add(drawing.rect(40, 40, 20, 20)).attr({fill: "green"})
+# bunch = drawing.group()
+# bunch.add(drawing.circle(20, 20, 20)).attr({fill: "red", stroke: "blue"})
+# bunch.add(drawing.rect(40, 40, 20, 20)).attr({fill: "green"})
 
-reference = drawing.group().attr({id: "reference"})
-reference.add(bunch)
-reference.toDefs()
+# reference = drawing.group().attr({id: "reference"})
+# reference.add(bunch)
+# reference.toDefs()
 
 # Use a reference defenition element in a group, on given coordinates
 addReference = (x, y, g) -> g.add( drawing.use().attr("xlink:href": "#reference").transform("t#{x},#{y}") )
@@ -33,13 +33,13 @@ squareForm.toDefs()
 diamondForm = drawing.polyline([[-30,0], [-20, -20], [20, -20], [30, 0], [0, 40]])
 diamondForm.toDefs()
 starForm = drawing.group()
+starForm.toDefs()
 starForm.add(drawing.polyline([[0, -30], [30, 16], [-30, 16]]))
 starForm.add(drawing.polyline([[0, 30], [30, -16], [-30, -16]]))
-starForm.toDefs()
 wingForm = drawing.group()
+wingForm.toDefs()
 wingForm.add(drawing.ellipse(0, 0, 16, 30))
 wingForm.add(drawing.ellipse(0, 0, 30, 16))
-wingForm.toDefs()
 beads = [circleForm, triangleForm, squareForm, diamondForm, starForm, wingForm]
 
 
@@ -62,6 +62,7 @@ cone.toDefs()
 
 
 # Function for making mirrors under an angle.
+# @see http://math.stackexchange.com/questions/525082/reflection-across-a-line
 #
 # @param k  slope of the mirror (tangens of angle with x-axis).
 # @return   Snap.Matrix
@@ -95,20 +96,29 @@ beadsGroup.toDefs()
 addBeads = (cnt) ->
     addBead(bead) for bead in beads for n in [0..cnt]
 
-addBead = (form) ->
+
+# Add all beads.
+# All beads are added on a random point, and with a random rotation
+# All beads are added four times, around our center point
+# 
+# @param beadDefinition     definition of the bead to add.
+# @return                   void
+addBead = (beadDefinition) ->
     rotation = "r" + Math.round(360 * Math.random()) + ",0,0"
 
     centers = []
     centers.push {x: Math.round(x * Math.random() * center.x), y: Math.round(y * Math.random() * center.y)} for y in [-1, 1] for x in [-1, 1]
-    bbox = form.getBBox()
+
+    bbox = beadDefinition.getBBox()
     translatex = (x) -> x - bbox.x
     translatey = (y) -> y - bbox.y
-    formTransforms = ("t#{translatex(c.x)},#{translatey(c.y)}" + rotation for c in centers)
+    transforms = ("t#{translatex(c.x)},#{translatey(c.y)}" + rotation for c in centers)
+
     hsb = "hsb(".concat(Math.random(), ",.75", ", .75)")
 
-    beadsGroup.add(form.clone().attr(fill: hsb, transform: t)) for t in formTransforms
+    beadsGroup.add(beadDefinition.clone().attr(fill: hsb, transform: t)) for t in transforms
 
-addBeads(5)
+addBeads(1)
 
 
 # 6 transformed bead views, 6 animations
