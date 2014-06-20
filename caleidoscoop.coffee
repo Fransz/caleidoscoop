@@ -36,6 +36,7 @@ theCone.toDefs()
 # background rectangle.
 theRect = drawing.rect(0, 0, 600, 600).attr({fill: "black", "pointer-events": "all"})
 
+
 # edit button
 editButton = drawing.group().attr({display: "inline"})
 editButton.add(drawing.rect(560, 570, 40, 30).attr({ id: "edit", fill: "green" , "pointer-events": "all"}))
@@ -43,20 +44,29 @@ editButton.add(drawing.text(570, 590, "edit").attr({ fill: "white", "pointer-eve
 
 editHandler = (evt) ->
     console.log 'Edit'
+    caleidoscoop.stopAnimation()
+    caleidoscoop.clear()
+
+    editor = new Editor(caleidoscoop.beadDefinitions, caleidoscoop.beadsGroup)
 
 editButton.click(editHandler)
 
 
 
-
 class Caleidoscoop
-    beadDefinitions: []
-
-    transformations: []
-
     center: {x: 300, y: 300}
 
-    beadsGroup: drawing.group().attr({id: "eads"}).toDefs()
+    beadDefinitions: []                                         # all known beads
+
+    transformations: []                                         # all transformations, from the given mirrors.
+
+    beadsGroup: drawing.group().attr({id: "beads"}).toDefs()    # all beads drawn in chamber 0.
+
+    transformedGroups: []                                       # group of beads in chamber 0 transformed, animated.
+
+    chambers: []                                                # group of transformed beads, clipped.
+
+
 
     clipCone: null
 
@@ -77,14 +87,11 @@ class Caleidoscoop
             m[0].clone().add(m[1]).add(m[2]).add(m[0]).add(m[1]).toTransformString()
         ]
 
-        this.addBead(bead) for bead in @beadDefinitions
-        this.addBead(bead) for bead in @beadDefinitions
+        this.addBead(bead, @beadsGroup) for bead in @beadDefinitions
 
-        @transformedBeads = (@beadsGroup.use().transform(t) for t in @transformations)
-        @animationTransforms = ({transform: t + "r360,0,0"} for t in @transformations)
+        @transformedGroups = (@beadsGroup.use().transform(t) for t in @transformations)
 
-        this.drawGroup(@transformedBeads[n], @transformations[n]) for n in  [0...6]
-        this.animateGroup(@transformedBeads[n], @transformations[n]) for n in  [0...6]
+        this.drawChamber(@transformedGroups[n], @transformations[n]) for n in  [0...6]
 
     # Function for making mirrors under an angle.
     # @see http://math.stackexchange.com/questions/525082/reflection-across-a-line
@@ -105,8 +112,9 @@ class Caleidoscoop
     # The beads are added four times, around our center point
     # 
     # @param beadDefinition     definition of the bead to add.
+    # @param group              group to add to.
     # @return                   void
-    addBead: (beadDefinition) ->
+    addBead: (beadDefinition, group) ->
         rotation = "r" + Math.round(360 * Math.random()) + ",0,0"
 
         centers = []
@@ -119,18 +127,24 @@ class Caleidoscoop
 
         hsb = "hsb(".concat(Math.random(), ",.75", ", .75)")
 
-        @beadsGroup.add(beadDefinition.use().attr(fill: hsb, transform: t)) for t in transforms
+        group.add(beadDefinition.use().attr(fill: hsb, transform: t)) for t in transforms
 
 
-    # Draws a bead group with a transformed clipping cone
+    # Draws a bead group with a clipping cone, animates the beadsgroup.
+    # The chamber itself (i.e. beadsbroup + clippingCone) is not animated.
+    # We keep track of all chambers.
     #
     # @param beadGroup          The group of beads to add.
     # @param beadTransform      The corresponding clipping path transformation.
     # @return                   void
-    drawGroup: (beadGroup, beadTransform) ->
+    drawChamber: (beadGroup, beadTransform) ->
+        this.animateGroup(beadGroup, beadTransform)
+
         chamber = drawing.group().transform("t #{@center.x}, #{@center.y}")
         chamber.add(beadGroup)
         chamber.attr({ clipPath: @clipCone.use().transform(beadTransform)})
+
+        @chambers.push(chamber)
 
 
 
@@ -150,6 +164,116 @@ class Caleidoscoop
 
         animateGroupCnt(beadGroup, beadTransform, 1)
 
+
+     # Stops all beadGroups from animating.
+     #
+     # @return  void
+     stopAnimation: () ->
+        beadGroup.stop() for beadGroup in @transformedGroups
+
+
+     # removes all chambers
+     #
+     # @return void.
+    clear: () ->
+        chamber.remove() for chamber in @chambers
+
+
+
+class Editor
+    beadDefinitions: []
+
+    center: {x: 300, y: 300}
+
+    beadsGroup: null
+
+    constructor: (beadDefinitions, beadGroup) ->
+        @beadsDefinitions = beadDefinitions
+        @beadsGroup = beadGroup
+
+        drawing.rect(0, 0, @center.x * 2, @center.y *2).attr({stroke: "red", "stroke-width": "1px"})
+        drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
+
+        # clear editor button
+        clearEditButton = drawing.group().attr({display: "inline"})
+        clearEditButton.add(drawing.rect(610, 550, 50, 30).attr({ id: "edit", fill: "green" , "pointer-events": "all"}))
+        clearEditButton.add(drawing.text(620, 570, "clear").attr({ fill: "white", "pointer-events": "all"}))
+
+        clearEditButton.click((evt) =>
+            @beadsGroup.remove()
+            @beadsGroup = drawing.group()
+        )
+
+        this._addDefinitions(beadDefinitions)
+        chamber = drawing.group().transform("t #{@center.x}, #{@center.y}")
+        chamber.add(beadGroup)
+
+
+    # Adds all beads to a definition panel.
+    #
+    # @param beads The definitions of our beads
+    # @return void
+    _addDefinitions: (beadDefinitions) ->
+        defPanelHeight = @center.y * 2
+        defPanelWidth = 100
+
+        defGroup = drawing.group()
+
+        # Add all definitons to our panel on the correct coordinates.
+        n = 0
+        xOffset = @center.x * 2 + 100
+        yOffset = 40
+        while n < beadDefinitions.length
+            [_xOff, _yOff] = this._addDefinition(beadDefinitions[n], defGroup, xOffset, yOffset)
+            yOffset += _yOff + 20
+            n += 1
+
+    # Add a single bead to the definitions panel
+    # A use element is made from the bead, and added to the panel. 
+    # A click handler for selecting the bead is added to the use element
+    #
+    # @param bead the definition element of the bead to add.
+    # @param defGroup The group to add the bead to.
+    # @param xOffset Where on our paper to put the definition.
+    # @param yOffset Where on our paper to put the definition.
+    #
+    # @return A tuple with the x- and yOffset of the added use element.
+    _addDefinition: (beadDefinition, defGroup, xOffset, yOffset) ->
+            bbox = beadDefinition.getBBox()
+            _xOff = xOffset + bbox.width / 2
+            _yOff = bbox.height
+            transformString = "t #{_xOff}, #{yOffset}"
+            useElement = beadDefinition.use()
+            defGroup.add(useElement.transform(transformString).attr({fill: "red"}))
+
+            # clickHandler = () ->
+                # create another use element, with the sme transformation.
+                # useElement = drawing.add(beadDefinition.use().transform(transformString).attr({fill: "green", stroke: "yellow", "stroke-width": "2px"}))
+
+
+            # useElement.click(clickHandler)
+            # drgMove = (dx, dy, x, y, evt) -> 
+                # useElement.transform(useElement.startMatrix.translate(dx, dy))
+                # console.log useElement.startMatrix
+                # console.log dx + " " + dy
+
+            drgStart = (x, y, evt) ->
+                useElement.startMatrix = useElement.transform().localMatrix
+                useElement.startE = useElement.transform().localMatrix.e
+                useElement.startF = useElement.transform().localMatrix.f
+
+            drgMove = (dx, dy, x, y) ->
+                m = useElement.transform().localMatrix 
+                console.log "Matrix" + m.e + " " + m.f
+                console.log dx + " " + dy
+                console.log x + " " + y
+                m.e = useElement.startE + dx
+                m.f = useElement.startF + dy
+                useElement.transform(m)
+
+            useElement.drag(drgMove, drgStart)
+
+            [_xOff, _yOff]
 
 
 
