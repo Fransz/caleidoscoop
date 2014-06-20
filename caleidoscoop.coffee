@@ -243,37 +243,89 @@ class Editor
             _xOff = xOffset + bbox.width / 2
             _yOff = bbox.height
             transformString = "t #{_xOff}, #{yOffset}"
-            useElement = beadDefinition.use()
-            defGroup.add(useElement.transform(transformString).attr({fill: "red"}))
+            templateElement = beadDefinition.use()
+            defGroup.add(templateElement.transform(transformString).attr({fill: "red"}))
 
-            # clickHandler = () ->
+            clickHandler = (evt, x, y) ->
+                coordXY = (evt) ->
+                    console.log evt
+                    containerX = document.getElementById('canvas').offsetLeft
+                    containerY = document.getElementById('canvas').offsetTop
+
+                    coord={ X: null, Y: null }
+                    isTouchSupported = 'ontouchstart' in window
+
+                    if(isTouchSupported)
+                        coord.X = evt.clientX-containerX
+                        coord.Y = evt.clientY-containerY
+                        coord
+
+                    else if(evt.offsetX || evt.offsetX == 0)
+                        coord.X = evt.offsetX
+                        coord.Y = evt.offsetY
+                        coord
+
+                    else if(evt.layerX || evt.layerX == 0)
+                        coord.X = evt.layerX
+                        coord.Y = evt.layerY
+                        coord
+
+                console.log "coordXY"
+                console.log coordXY
                 # create another use element, with the sme transformation.
-                # useElement = drawing.add(beadDefinition.use().transform(transformString).attr({fill: "green", stroke: "yellow", "stroke-width": "2px"}))
+                newElement = beadDefinition.use().transform(transformString).attr({fill: "green", stroke: "yellow", "stroke-width": "2px"})
+                drawing.add(newElement)
 
+                matrix = newElement.transform().localMatrix
+                newElement.startE = matrix.e
+                newElement.startF = matrix.f
 
-            # useElement.click(clickHandler)
-            # drgMove = (dx, dy, x, y, evt) -> 
-                # useElement.transform(useElement.startMatrix.translate(dx, dy))
-                # console.log useElement.startMatrix
-                # console.log dx + " " + dy
+                pickupHandler = (evt, x, y) ->
+                    matrix = newElement.transform().localMatrix
+                    newElement.startE = matrix.e
+                    newElement.startF = matrix.f
+                    newElement.mousemove(moveHandler)
+                    newElement.unclick(pickupHandler)
+                    newElement.click(releaseHandler)
+
+                moveHandler = (evt, dx, dy) ->
+                    console.log "move to" + dx + " " + dy
+
+                    coord = coordXY(evt)
+                    console.log coord
+
+                    matrix = newElement.transform().localMatrix
+                    matrix.e = coord.X
+                    matrix.f = coord.Y
+                    newElement.transform(matrix)
+
+                releaseHandler = (evt, x, y) ->
+                    newElement.unmousemove(moveHandler)
+                    newElement.unclick(releaseHandler)
+                    newElement.click(pickupHandler)
+                
+                newElement.mousemove(moveHandler)
+                newElement.unclick(clickHandler)
+                newElement.click(releaseHandler)
+
 
             drgStart = (x, y, evt) ->
-                useElement.startMatrix = useElement.transform().localMatrix
-                useElement.startE = useElement.transform().localMatrix.e
-                useElement.startF = useElement.transform().localMatrix.f
+                matrix = useElement.transform().localMatrix
+                useElement.startE = matrix.e
+                useElement.startF = matrix.f
 
             drgMove = (dx, dy, x, y) ->
-                m = useElement.transform().localMatrix 
-                console.log "Matrix" + m.e + " " + m.f
-                console.log dx + " " + dy
-                console.log x + " " + y
-                m.e = useElement.startE + dx
-                m.f = useElement.startF + dy
-                useElement.transform(m)
+                matrix = useElement.transform().localMatrix
+                matrix.e = useElement.startE + dx
+                matrix.f = useElement.startF + dy
+                useElement.transform(matrix)
 
-            useElement.drag(drgMove, drgStart)
+            # useElement.drag(drgMove, drgStart)
+            templateElement.click(clickHandler)
 
             [_xOff, _yOff]
+
+
 
 
 
