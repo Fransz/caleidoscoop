@@ -43,7 +43,6 @@ editButton.add(drawing.rect(560, 570, 40, 30).attr({ id: "edit", fill: "green" ,
 editButton.add(drawing.text(570, 590, "edit").attr({ fill: "white", "pointer-events": "all"}))
 
 editHandler = (evt) ->
-    console.log 'Edit'
     caleidoscoop.stopAnimation()
     caleidoscoop.clear()
 
@@ -71,7 +70,7 @@ class Caleidoscoop
     clipCone: null
 
 
-    constructor : (beads, mirrors, clipCone) ->
+    constructor: (beads, mirrors, clipCone) ->
         @clipCone = clipCone
 
         @beadDefinitions.push(b) for b in beads
@@ -93,6 +92,8 @@ class Caleidoscoop
 
         this.drawChamber(@transformedGroups[n], @transformations[n]) for n in  [0...6]
 
+
+
     # Function for making mirrors under an angle.
     # @see http://math.stackexchange.com/questions/525082/reflection-across-a-line
     #
@@ -106,6 +107,8 @@ class Caleidoscoop
             
         t = new Snap.Matrix()
         t.add(mirror(Math.tan(a)))
+
+
 
     # Add a beads to the beadsGroup.
     # The beads are added on a random point, and with a random rotation
@@ -128,6 +131,7 @@ class Caleidoscoop
         hsb = "hsb(".concat(Math.random(), ",.75", ", .75)")
 
         group.add(beadDefinition.use().attr(fill: hsb, transform: t)) for t in transforms
+
 
 
     # Draws a bead group with a clipping cone, animates the beadsgroup.
@@ -165,11 +169,13 @@ class Caleidoscoop
         animateGroupCnt(beadGroup, beadTransform, 1)
 
 
+
      # Stops all beadGroups from animating.
      #
      # @return  void
      stopAnimation: () ->
         beadGroup.stop() for beadGroup in @transformedGroups
+
 
 
      # removes all chambers
@@ -187,24 +193,43 @@ class Editor
 
     beadsGroup: null
 
+
+    # constructor for our editor.
+    # Draws all defined beads so we can add them; draws all beads in the caleidoscoop; adds a clear button.
+    #
+    # @param beadDefinitions  An array with all beadsDefinitions.
+    # @param beadGroup An array with all beads drawn in the caleidoscoop.
     constructor: (beadDefinitions, beadGroup) ->
         @beadsDefinitions = beadDefinitions
         @beadsGroup = beadGroup
 
-        drawing.rect(0, 0, @center.x * 2, @center.y *2).attr({stroke: "red", "stroke-width": "1px"})
-        drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
+        editArea = drawing.rect(0, 0, @center.x * 2, @center.y *2).attr({stroke: "red", "stroke-width": "1px"})
+        editDot = drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
 
-        # clear editor button
+        # Create group with templates to drag and drop from.
+        defGroup = this._addDefinitions(beadDefinitions)
+
+        # clear editor button, with an event handler
         clearEditButton = drawing.group().attr({display: "inline"})
-        clearEditButton.add(drawing.rect(610, 550, 50, 30).attr({ id: "edit", fill: "green" , "pointer-events": "all"}))
-        clearEditButton.add(drawing.text(620, 570, "clear").attr({ fill: "white", "pointer-events": "all"}))
-
+        clearEditButton.add(drawing.rect(610, 500, 50, 30).attr({ id: "clear", fill: "green" , "pointer-events": "all"}))
+        clearEditButton.add(drawing.text(620, 520, "clear").attr({ fill: "white", "pointer-events": "all"}))
         clearEditButton.click((evt) =>
             @beadsGroup.remove()
             @beadsGroup = drawing.group()
         )
 
-        this._addDefinitions(beadDefinitions)
+        # play button, with an event handler
+        playButton = drawing.group().attr({display: "inline"})
+        playButton.add(drawing.rect(610, 550, 50, 30).attr({ id: "play", fill: "green" , "pointer-events": "all"}))
+        playButton.add(drawing.text(620, 570, "play").attr({ fill: "white", "pointer-events": "all"}))
+        playButton.click((evt) =>
+            editArea.remove()
+            editDot.remove()
+            defGroup.remove()
+            playButton.remove()
+            clearButton.remove()
+        )
+
         chamber = drawing.group().transform("t #{@center.x}, #{@center.y}")
         chamber.add(beadGroup)
 
@@ -228,8 +253,11 @@ class Editor
             yOffset += _yOff + 20
             n += 1
 
+        defGroup
+
+
     # Add a single bead to the definitions panel
-    # A use element is made from the bead, and added to the panel. 
+    # A use element is made from the beadDefinition, and added to the panel. 
     # A click handler for selecting the bead is added to the use element
     #
     # @param bead the definition element of the bead to add.
@@ -243,44 +271,54 @@ class Editor
             _xOff = xOffset + bbox.width / 2
             _yOff = bbox.height
             transformString = "t #{_xOff}, #{yOffset}"
+
             templateElement = beadDefinition.use()
             defGroup.add(templateElement.transform(transformString).attr({fill: "red"}))
 
-            clickHandler = (evt, x, y) ->
+            # The clickhandler for the beads in the panel.
+            clickHandler = (evt) ->
+                
+                # Helper function for calculating new coordinates while dragging
+                #
+                # @param evt  The event.
+                # @return object  An object with the new x and y coordinate.
                 coordXY = (evt) ->
-                    console.log evt
                     containerX = document.getElementById('canvas').offsetLeft
                     containerY = document.getElementById('canvas').offsetTop
 
-                    coord={ X: null, Y: null }
+                    coord = { x: null, y: null }
                     isTouchSupported = 'ontouchstart' in window
 
                     if(isTouchSupported)
-                        coord.X = evt.clientX-containerX
-                        coord.Y = evt.clientY-containerY
+                        coord.x = evt.clientX - containerX
+                        coord.y = evt.clientY - containerY
                         coord
 
                     else if(evt.offsetX || evt.offsetX == 0)
-                        coord.X = evt.offsetX
-                        coord.Y = evt.offsetY
+                        coord.x = evt.offsetX
+                        coord.y = evt.offsetY
                         coord
 
                     else if(evt.layerX || evt.layerX == 0)
-                        coord.X = evt.layerX
-                        coord.Y = evt.layerY
+                        coord.x = evt.layerX
+                        coord.y = evt.layerY
                         coord
 
-                console.log "coordXY"
-                console.log coordXY
-                # create another use element, with the sme transformation.
-                newElement = beadDefinition.use().transform(transformString).attr({fill: "green", stroke: "yellow", "stroke-width": "2px"})
+                # create another use element, with the same transformation as the bead in the panel.
+                newElement = beadDefinition.use().transform(transformString).attr({fill: "green"})
                 drawing.add(newElement)
 
+                # Store the initial transformation
                 matrix = newElement.transform().localMatrix
                 newElement.startE = matrix.e
                 newElement.startF = matrix.f
 
-                pickupHandler = (evt, x, y) ->
+                # Eventhandler for clicking on the new bead again.
+                #
+                # @param evt The click event.
+                # @param x
+                # @param y
+                pickupHandler = (evt) ->
                     matrix = newElement.transform().localMatrix
                     newElement.startE = matrix.e
                     newElement.startF = matrix.f
@@ -288,47 +326,43 @@ class Editor
                     newElement.unclick(pickupHandler)
                     newElement.click(releaseHandler)
 
-                moveHandler = (evt, dx, dy) ->
-                    console.log "move to" + dx + " " + dy
+                # Event handler for moving the new bead.
+                #
+                # @param evt The move event
+                # @param dx
+                # @param dy
+                moveHandler = (evt) ->
 
                     coord = coordXY(evt)
-                    console.log coord
 
                     matrix = newElement.transform().localMatrix
-                    matrix.e = coord.X
-                    matrix.f = coord.Y
+                    matrix.e = coord.x
+                    matrix.f = coord.y
                     newElement.transform(matrix)
 
-                releaseHandler = (evt, x, y) ->
+                # Event handler for releasing the new bead.
+                # Here we reassign eventhandlers on the new bead.
+                #
+                # @param evt The click event.
+                # @param x
+                # @param y
+                releaseHandler = (evt) ->
                     newElement.unmousemove(moveHandler)
                     newElement.unclick(releaseHandler)
                     newElement.click(pickupHandler)
                 
+                # Assign event handlers.
                 newElement.mousemove(moveHandler)
                 newElement.unclick(clickHandler)
                 newElement.click(releaseHandler)
 
 
-            drgStart = (x, y, evt) ->
-                matrix = useElement.transform().localMatrix
-                useElement.startE = matrix.e
-                useElement.startF = matrix.f
-
-            drgMove = (dx, dy, x, y) ->
-                matrix = useElement.transform().localMatrix
-                matrix.e = useElement.startE + dx
-                matrix.f = useElement.startF + dy
-                useElement.transform(matrix)
-
-            # useElement.drag(drgMove, drgStart)
             templateElement.click(clickHandler)
 
             [_xOff, _yOff]
 
 
-
-
-
+# Globals for all beads, and all mirrors.
 theBeads = [circleForm, triangleForm, squareForm, diamondForm, starForm, wingForm]
 theMirrors = [0, Math.PI / 3, -Math.PI / 3 ]
 
