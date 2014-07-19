@@ -43,10 +43,10 @@ editButton.add(drawing.rect(560, 570, 40, 30).attr({ id: "edit", fill: "green" ,
 editButton.add(drawing.text(570, 590, "edit").attr({ fill: "white", "pointer-events": "all"}))
 
 editHandler = (evt) ->
-    caleidoscoop.stopAnimation()
-    caleidoscoop.clear()
+    theCaleidoscoop.stopAnimation()
+    theCaleidoscoop.clear()
 
-    editor = new Editor(caleidoscoop.beadDefinitions, caleidoscoop.beadsGroup)
+    editor = new Editor(theCaleidoscoop.beadDefinitions, theCaleidoscoop.beadsGroup)
 
 editButton.click(editHandler)
 
@@ -70,28 +70,33 @@ class Caleidoscoop
     clipCone: null
 
 
-    constructor: (beads, mirrors, clipCone) ->
+    constructor: (beads, angles, clipCone) ->
         @clipCone = clipCone
 
         @beadDefinitions.push(b) for b in beads
-
-        # @TODO make all transformations from all mirrors
-        m = (this.makeMirror k for k in mirrors)
-        @transformations = [
-            new Snap.Matrix(1, 0, 0, 1, 0, 0).toTransformString(),
-            m[0].clone().toTransformString(),
-            m[0].clone().add(m[1]).toTransformString(),
-            m[0].clone().add(m[1]).add(m[2]).toTransformString(),
-            m[0].clone().add(m[1]).add(m[2]).add(m[0]).toTransformString(),
-            m[0].clone().add(m[1]).add(m[2]).add(m[0]).add(m[1]).toTransformString()
-        ]
+        @transformations = this.makeTransformations(angles)
 
         this.addBead(bead, @beadsGroup) for bead in @beadDefinitions
+        this.makeTransformedGroups()
+        this.drawChambers()
 
-        @transformedGroups = (@beadsGroup.use().transform(t) for t in @transformations)
 
-        this.drawChamber(@transformedGroups[n], @transformations[n]) for n in  [0...6]
-
+    # Make all transformation matrices from the mirrors made by the given angels.
+    #
+    # @param angles An array with angles under which we find the mirrors.
+    # @return An array with transformation matrices for each mirror
+    #
+    # @TODO solve this properly.
+    makeTransformations: (angles) ->
+        mirrors = (this.makeMirror a for a in angles)
+        transformations = [
+            new Snap.Matrix(1, 0, 0, 1, 0, 0).toTransformString(),
+            mirrors[0].clone().toTransformString(),
+            mirrors[0].clone().add(mirrors[1]).toTransformString(),
+            mirrors[0].clone().add(mirrors[1]).add(mirrors[2]).toTransformString(),
+            mirrors[0].clone().add(mirrors[1]).add(mirrors[2]).add(mirrors[0]).toTransformString(),
+            mirrors[0].clone().add(mirrors[1]).add(mirrors[2]).add(mirrors[0]).add(mirrors[1]).toTransformString()
+        ]
 
 
     # Function for making mirrors under an angle.
@@ -108,6 +113,12 @@ class Caleidoscoop
         t = new Snap.Matrix()
         t.add(mirror(Math.tan(a)))
 
+
+    # Transform the beads group with the given transformation
+    #
+    # @return An array with the transformed beadsgroup for each mirror
+    makeTransformedGroups: () ->
+        @transformedGroups = (@beadsGroup.use().transform(t) for t in @transformations)
 
 
     # Add a beads to the beadsGroup.
@@ -132,6 +143,12 @@ class Caleidoscoop
 
         group.add(beadDefinition.use().attr(fill: hsb, transform: t)) for t in transforms
 
+
+    # Draw all chambers
+    #
+    # @return void
+    drawChambers: () ->
+        this.drawChamber(@transformedGroups[n], @transformations[n]) for n in  [0...6]
 
 
     # Draws a bead group with a clipping cone, animates the beadsgroup.
@@ -227,7 +244,11 @@ class Editor
             editDot.remove()
             defGroup.remove()
             playButton.remove()
-            clearButton.remove()
+            clearEditButton.remove()
+
+            theCaleidoscoop.beadsGroup = (bead.transform("t #{@center.x}, #{@center.y}") for bead in @beadsGroup)
+            theCaleidoscoop.makeTransformedGroups()
+            theCaleidoscoop.drawChambers()
         )
 
         chamber = drawing.group().transform("t #{@center.x}, #{@center.y}")
@@ -275,6 +296,8 @@ class Editor
             templateElement = beadDefinition.use()
             defGroup.add(templateElement.transform(transformString).attr({fill: "red"}))
 
+            self = this
+
             # The clickhandler for the beads in the panel.
             clickHandler = (evt) ->
                 
@@ -307,6 +330,7 @@ class Editor
                 # create another use element, with the same transformation as the bead in the panel.
                 newElement = beadDefinition.use().transform(transformString).attr({fill: "green"})
                 drawing.add(newElement)
+                # self.beadsGroup.add(newElement)
 
                 # Store the initial transformation
                 matrix = newElement.transform().localMatrix
@@ -347,6 +371,7 @@ class Editor
                 # @param x
                 # @param y
                 releaseHandler = (evt) ->
+                    self.beadsGroup.add(beadDefinition.use().transform(transformString).attr({fill: "green"}))
                     newElement.unmousemove(moveHandler)
                     newElement.unclick(releaseHandler)
                     newElement.click(pickupHandler)
@@ -364,6 +389,6 @@ class Editor
 
 # Globals for all beads, and all mirrors.
 theBeads = [circleForm, triangleForm, squareForm, diamondForm, starForm, wingForm]
-theMirrors = [0, Math.PI / 3, -Math.PI / 3 ]
+theAngles = [0, Math.PI / 3, -Math.PI / 3 ]
 
-caleidoscoop = new Caleidoscoop theBeads, theMirrors, theCone
+theCaleidoscoop = new Caleidoscoop theBeads, theAngles, theCone
