@@ -249,8 +249,8 @@ class Editor
     # @param beadGroup An array with all beads drawn in the caleidoscoop.
     constructor: (beadDefinitions, beadsArray) ->
         editArea = drawing.rect(0, 0, @center.x * 2, @center.y *2).attr({stroke: "red", "stroke-width": "1px"})
-        editDot = drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
         editCircle = drawing.circle(@center.x, @center.y, 300).attr({stroke: "blue", "stroke-width": "1px"})
+        editDot = drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
         @editorGroup = drawing.group().attr({id: "editbeads"})
 
         # Create group with templates to drag and drop from.
@@ -277,6 +277,7 @@ class Editor
             playButton.remove()
             clearEditButton.remove()
 
+            theCaleidoscoop.allBeads = @allBeads
             theCaleidoscoop.addBeadToMasterGroup(bead) for bead in @allBeads
             theCaleidoscoop.makeTransformedGroups()
             theCaleidoscoop.drawChambers()
