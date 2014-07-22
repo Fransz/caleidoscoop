@@ -12,8 +12,6 @@ class editableBead
     #
     # @param templateBead   The template from which to create this editable bead.
     constructor: (templateBead) ->
-        bead = templateBead.bead
-
         tString = templateBead.bead.transform().string
         matrix = templateBead.bead.transform().localMatrix
         @bead = templateBead.definition.use().transform(tString).attr({fill: "green"})
@@ -68,9 +66,9 @@ class editableBead
             self.bead.startE = matrix.e
             self.bead.startF = matrix.f
 
-            self.bead.unclick(@pickupHandler)
-            self.bead.click(@releaseHandler)
-            self.bead.mousemove(@dragHandler)
+            self.bead.unclick(self.pickupHandler)
+            self.bead.click(self.releaseHandler)
+            self.bead.mousemove(self.dragHandler)
 
 
     # Event handler for moving the new bead.

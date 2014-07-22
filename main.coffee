@@ -60,8 +60,8 @@ editButton.add(drawing.text(570, 590, "edit").attr({ fill: "white", "pointer-eve
 editHandler = (evt) ->
     theCaleidoscoop.stopAnimation()
     theCaleidoscoop.clear()
+    theEditor.show()
 
-    window.theEditor = new Editor(theBeads, theCaleidoscoop.allBeads)
 
 editButton.click(editHandler)
 
@@ -75,4 +75,4 @@ editButton.click(editHandler)
 # Globals for all beads, and all mirrors.
 
 theCaleidoscoop = new caleidoscoop.Caleidoscoop theBeads, theAngles, theCone
-window.theEditor = null
+theEditor = new Editor(theBeads, theCaleidoscoop.allBeads)

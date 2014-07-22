@@ -17,10 +17,10 @@ class caleidoscoop.Editor
     # @param beadDefinitions  An array with all beadsDefinitions.
     # @param beadGroup An array with all beads drawn in the caleidoscoop.
     constructor: (beadDefinitions, beadsArray) ->
-        @editorGroup = drawing.group().attr({id: "editor"})
-        this.initPlayButton()
-        this.initClearButton()
-        this.initBorders()
+        @editorGroup = drawing.group().attr({id: "editor", display: "none"})
+        this._initPlayButton()
+        this._initClearButton()
+        this._initBorders()
 
         @templateGroup = drawing.group().attr({id: "templates"})
         @templateGroup.transform("t #{@center.x}, #{@center.y}")
@@ -30,61 +30,15 @@ class caleidoscoop.Editor
         @beadGroup.transform("t #{@center.x}, #{@center.y}")
         @editorGroup.add(@beadGroup)
 
-        this.initTemplateBeads(beadDefinitions, @templateBeads)
+        this._initTemplateBeads(beadDefinitions, @templateBeads)
         this.displayTemplateBeads(@templateGroup)
-
-
-    # init the editors play button
-    #
-    # @return void
-    initClearButton: () ->
-        clearButton = drawing.group().attr({id: "clearbutton", display: "inline"})
-        clearButton.add(drawing.rect(610, 500, 50, 30).attr({ fill: "green" , "pointer-events": "all"}))
-        clearButton.add(drawing.text(620, 520, "clear").attr({ fill: "white", "pointer-events": "all"}))
-        @editorGroup.add(clearButton)
-
-        clearButton.click((evt) =>
-            bead.remove() for bead in @allBeads
-            @allBeads = []
-        )
-
-
-    # init the editors clear button
-    #
-    # @return void
-    initPlayButton: () ->
-        playButton = drawing.group().attr({id: "playbutton", display: "inline"})
-        playButton.add(drawing.rect(610, 550, 50, 30).attr({ fill: "green" , "pointer-events": "all"}))
-        playButton.add(drawing.text(620, 570, "play").attr({ fill: "white", "pointer-events": "all"}))
-        @editorGroup.add(playButton)
-
-        playButton.click((evt) =>
-            @editorGroup.attr({id: "test", display: "none"})
-
-            theCaleidoscoop.allBeads = @allBeads
-            theCaleidoscoop.addBeadToMasterGroup(bead) for bead in @allBeads
-            theCaleidoscoop.makeTransformedGroups()
-            theCaleidoscoop.drawChambers()
-        )
-
-
-    # init the editors borders
-    #
-    # @return void
-    initBorders: () ->
-        editArea = drawing.rect(0, 0, @center.x * 2, @center.y *2).attr({stroke: "red", "stroke-width": "1px"})
-        @editorGroup.add(editArea)
-        editCircle = drawing.circle(@center.x, @center.y, 300).attr({stroke: "blue", "stroke-width": "1px"})
-        @editorGroup.add(editCircle)
-        editDot = drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
-        @editorGroup.add(editDot)
 
 
     # init the template beads while constructing the object.
     #
     # @param beadDefinitions Definitions for the template beads.
     # @return void
-    initTemplateBeads: (beadDefinitions, templateBeads) ->
+    _initTemplateBeads: (beadDefinitions, templateBeads) ->
         for bDef in beadDefinitions
             do (bDef) ->
                 templateBeads.push(new TemplateBead(bDef))
@@ -109,3 +63,56 @@ class caleidoscoop.Editor
     addBead: (bead) ->
         @beadGroup.add(bead)
         @allBeads.push(bead)
+
+    # Shows the editor
+    #
+    # @return void
+    show: () ->
+        @editorGroup.attr({display: "block"})
+
+    # init the editors play button
+    #
+    # @return void
+    _initClearButton: () ->
+        clearButton = drawing.group().attr({id: "clearbutton", display: "inline"})
+        clearButton.add(drawing.rect(610, 500, 50, 30).attr({ fill: "green" , "pointer-events": "all"}))
+        clearButton.add(drawing.text(620, 520, "clear").attr({ fill: "white", "pointer-events": "all"}))
+        @editorGroup.add(clearButton)
+
+        clearButton.click((evt) =>
+            bead.remove() for bead in @allBeads
+            @allBeads = []
+        )
+
+
+    # init the editors clear button
+    #
+    # @return void
+    _initPlayButton: () ->
+        playButton = drawing.group().attr({id: "playbutton", display: "inline"})
+        playButton.add(drawing.rect(610, 550, 50, 30).attr({ fill: "green" , "pointer-events": "all"}))
+        playButton.add(drawing.text(620, 570, "play").attr({ fill: "white", "pointer-events": "all"}))
+        @editorGroup.add(playButton)
+
+        playButton.click((evt) =>
+            @editorGroup.attr({id: "test", display: "none"})
+
+            theCaleidoscoop.allBeads = @allBeads
+            theCaleidoscoop.addBeadToMasterGroup(bead) for bead in @allBeads
+            theCaleidoscoop.makeTransformedGroups()
+            theCaleidoscoop.drawChambers()
+        )
+
+
+    # init the editors borders
+    #
+    # @return void
+    _initBorders: () ->
+        editArea = drawing.rect(0, 0, @center.x * 2, @center.y *2).attr({stroke: "red", "stroke-width": "1px"})
+        @editorGroup.add(editArea)
+        editCircle = drawing.circle(@center.x, @center.y, 300).attr({stroke: "blue", "stroke-width": "1px"})
+        @editorGroup.add(editCircle)
+        editDot = drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
+        @editorGroup.add(editDot)
+
+
