@@ -61,7 +61,7 @@ editHandler = (evt) ->
     theCaleidoscoop.stopAnimation()
     theCaleidoscoop.clear()
 
-    editor = new Editor(theBeads, theCaleidoscoop.allBeads)
+    window.theEditor = new Editor(theBeads, theCaleidoscoop.allBeads)
 
 editButton.click(editHandler)
 
@@ -75,3 +75,4 @@ editButton.click(editHandler)
 # Globals for all beads, and all mirrors.
 
 theCaleidoscoop = new caleidoscoop.Caleidoscoop theBeads, theAngles, theCone
+window.theEditor = null

@@ -29,6 +29,7 @@ class editableBead
         @bead.mousemove(@dragHandler)
         @bead.click(@releaseHandler)
         drawing.add(@bead)
+        theEditor.addBead(@bead)
 
     # Helper function for calculating new coordinates while dragging
     #
@@ -42,18 +43,18 @@ class editableBead
         isTouchSupported = 'ontouchstart' in window
 
         if(isTouchSupported)
-            coord.x = evt.clientX - containerX
-            coord.y = evt.clientY - containerY
+            coord.x = evt.clientX - containerX - 300
+            coord.y = evt.clientY - containerY - 300
             coord
 
         else if(evt.offsetX || evt.offsetX == 0)
-            coord.x = evt.offsetX
-            coord.y = evt.offsetY
+            coord.x = evt.offsetX - 300
+            coord.y = evt.offsetY - 300
             coord
 
         else if(evt.layerX || evt.layerX == 0)
-            coord.x = evt.layerX
-            coord.y = evt.layerY
+            coord.x = evt.layerX - 300
+            coord.y = evt.layerY - 300
             coord
 
     # Eventhandler for clicking on the new bead again.
@@ -70,6 +71,7 @@ class editableBead
             self.bead.unclick(@pickupHandler)
             self.bead.click(@releaseHandler)
             self.bead.mousemove(@dragHandler)
+
 
     # Event handler for moving the new bead.
     #
@@ -91,14 +93,6 @@ class editableBead
         self = this
 
         @releaseHandler = (evt) ->
-            newBead = beadDefinition.use().attr({fill: "green"})
-            initialTransform = newElement.transform().localMatrix
-            initialTransform.e -= 300
-            initialTransform.f -= 300
-            newBead.transform(initialTransform)
-            self.editorGroup.add(newBead)
-            self.allBeads.push(newBead)
-
-            self.bead.unclick(@releaseHandler)
-            self.bead.click(@pickupHandler)
-            self.bead.mouseunmove(@dragHandler)
+            self.bead.unclick(self.releaseHandler)
+            self.bead.click(self.pickupHandler)
+            self.bead.unmousemove(self.dragHandler)

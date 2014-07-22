@@ -3,12 +3,13 @@ caleidoscoop = caleidoscoop || {}
 class caleidoscoop.Editor
     center: {x: 300, y: 300}
 
-    editorGroup: null                                                           # A group for all beads.
+    editorGroup: null                                      # A group for all editor components
 
-    templateGroup: null                                                         # A group for the templates from the bead definitions.
+    beadGroup: null                                        # A group for all beads.
+    allBeads: []                                           # An array for all beads.
 
-    allBeads: []                                                                # An array for all beads.
-    templateBeads: []                                                           # An array for all templateBeads.
+    templateGroup: null                                    # A group for the templates from the bead definitions.
+    templateBeads: []                                      # An array for all templateBeads.
 
     # constructor for our editor.
     # Draws all defined beads so we can add them; draws all beads in the caleidoscoop; adds a clear button.
@@ -16,15 +17,18 @@ class caleidoscoop.Editor
     # @param beadDefinitions  An array with all beadsDefinitions.
     # @param beadGroup An array with all beads drawn in the caleidoscoop.
     constructor: (beadDefinitions, beadsArray) ->
+        @editorGroup = drawing.group()
+        this.initButtons()
+        this.initBorders()
+
         @templateGroup = drawing.group()
+        @templateGroup.transform("t #{@center.x}, #{@center.y}")
+        @beadGroup = drawing.group()
+        @beadGroup.transform("t #{@center.x}, #{@center.y}")
 
         this.initTemplateBeads(beadDefinitions, @templateBeads)
         this.displayTemplateBeads(@templateGroup)
 
-        editArea = drawing.rect(0, 0, @center.x * 2, @center.y *2).attr({stroke: "red", "stroke-width": "1px"})
-        editCircle = drawing.circle(@center.x, @center.y, 300).attr({stroke: "blue", "stroke-width": "1px"})
-        editDot = drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
-        @editorGroup = drawing.group().attr({id: "editbeads"})
 
 
         # Create group with templates to drag and drop from.
@@ -35,8 +39,8 @@ class caleidoscoop.Editor
         clearEditButton.add(drawing.rect(610, 500, 50, 30).attr({ id: "clear", fill: "green" , "pointer-events": "all"}))
         clearEditButton.add(drawing.text(620, 520, "clear").attr({ fill: "white", "pointer-events": "all"}))
         clearEditButton.click((evt) =>
-            @editorGroup.remove()
-            @editorGroup = drawing.group().attr({id: "editbeads"})
+            @beadGroup.remove()
+            @beadGroup = drawing.group().attr({id: "editbeads"})
         )
 
         # play button, with an event handler
@@ -47,7 +51,7 @@ class caleidoscoop.Editor
             editArea.remove()
             editDot.remove()
             @templateGroup.remove()
-            @editorGroup.remove()
+            @beadGroup.remove()
             playButton.remove()
             clearEditButton.remove()
 
@@ -57,8 +61,19 @@ class caleidoscoop.Editor
             theCaleidoscoop.drawChambers()
         )
 
-        @editorGroup.add(bead) for bead in beadsArray
-        @editorGroup.transform("t #{@center.x}, #{@center.y}")
+        @beadGroup.add(bead) for bead in beadsArray
+
+    # init the editors buttons
+    initButtons: () ->
+
+    # init the editors borders
+    initBorders: () ->
+        editArea = drawing.rect(0, 0, @center.x * 2, @center.y *2).attr({stroke: "red", "stroke-width": "1px"})
+        @editorGroup.add(editArea)
+        editCircle = drawing.circle(@center.x, @center.y, 300).attr({stroke: "blue", "stroke-width": "1px"})
+        @editorGroup.add(editCircle)
+        editDot = drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
+        @editorGroup.add(editDot)
 
     # init the template beads while constructing the object.
     #
@@ -75,13 +90,21 @@ class caleidoscoop.Editor
     #
     # @return void.
     displayTemplateBeads: (templateGroup) ->
-        offsetX = 700
-        offsetY = 40
+        offsetX = 400
+        offsetY = -260
 
         for tBead in @templateBeads
             do (tBead) ->
                 offsetY += tBead.display(offsetX, offsetY, templateGroup)
 
+
+    # addBead adds an use element.
+    #
+    # @param bead the bead to add.
+    # XXX editor2Caleidoscoop.
+    addBead: (bead) ->
+        @beadGroup.add(bead)
+        @allBeads.push(bead)
 
 
     # Adds a use element from all beads definitions to the template group.
@@ -154,7 +177,7 @@ class caleidoscoop.Editor
                 # create another use element, with the same transformation as the bead in the panel.
                 newElement = beadDefinition.use().transform(transformString).attr({fill: "green"})
                 drawing.add(newElement)
-                # self.editorGroup.add(newElement)
+                # self.beadGroup.add(newElement)
 
                 # Store the initial transformation
                 matrix = newElement.transform().localMatrix
@@ -199,7 +222,7 @@ class caleidoscoop.Editor
                     initialTransform.e -= 300
                     initialTransform.f -= 300
                     newBead.transform(initialTransform)
-                    self.editorGroup.add(newBead)
+                    self.beadGroup.add(newBead)
                     self.allBeads.push(newBead)
 
                     newElement.unmousemove(moveHandler)
