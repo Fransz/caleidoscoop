@@ -22,7 +22,7 @@ class caleidoscoop.Caleidoscoop
         @masterGroup = drawing.group().attr({id: "beads"}).toDefs()
         @transformations = this.makeTransformations(angles)
 
-        this.createBeads(beadDefinition) for beadDefinition in beadDefinitions
+        this.createBeads(beadDefinition, @allBeads) for beadDefinition in beadDefinitions
         this.addBeadToMasterGroup(bead) for bead in @allBeads
         this.makeTransformedGroups()
         this.drawChambers()
@@ -73,7 +73,7 @@ class caleidoscoop.Caleidoscoop
     #
     # @param beadDef  The definition of the bead.
     # @return void
-    createBeads: (beadDefinition) ->
+    createBeads: (beadDefinition, allBeads) ->
         rotation = "r" + Math.round(360 * Math.random()) + ",0,0"
 
         centers = []
@@ -86,7 +86,11 @@ class caleidoscoop.Caleidoscoop
 
         hsb = "hsb(".concat(Math.random(), ",.75", ", .75)")
 
-        @allBeads.push(beadDefinition.use().attr(fill: hsb, transform: t)) for t in transforms
+        for t in transforms
+            do (t) ->
+                cBead = new CaleidoscoopBead(beadDefinition, hsb, t)
+                allBeads.push(cBead)
+
 
 
 
@@ -94,8 +98,8 @@ class caleidoscoop.Caleidoscoop
     #
     # @param bead  The bead.
     # @return void
-    addBead: (bead) ->
-        @allBeads.push(bead)
+    addBead: (cBead) ->
+        @allBeads.push(cBead)
 
 
 
@@ -103,8 +107,8 @@ class caleidoscoop.Caleidoscoop
     #
     # @param bead  The bead.
     # @return void.
-    addBeadToMasterGroup: (bead) ->
-        @masterGroup.add(bead)
+    addBeadToMasterGroup: (cBead) ->
+        @masterGroup.add(cBead.bead)
 
 
 

@@ -1,20 +1,28 @@
 caleidoscoop = caleidoscoop || {}
 
-class editableBead
+class caleidoscoop.EditableBead
     bead = null
     pickupHandler = null
     dragHandler = null
     releaseHandler = null
+
+    fromCaleidoscoop: () ->
+        @bead.click(@pickupHandler)
+
+
+    fromTemplate: () ->
+        @bead.mousemove(@dragHandler)
+        @bead.click(@releaseHandler)
 
 
     # Constructor for the editable bead. We create it from a template bead, copy its transformation and assign
     # eventhandlers
     #
     # @param templateBead   The template from which to create this editable bead.
-    constructor: (templateBead) ->
+    constructor: (templateBead, fill) ->
         tString = templateBead.bead.transform().string
         matrix = templateBead.bead.transform().localMatrix
-        @bead = templateBead.definition.use().transform(tString).attr({fill: "green"})
+        @bead = templateBead.definition.use().transform(tString).attr({fill: fill})
 
         # Store the initial transformations
         @bead.startE = matrix.e
@@ -24,8 +32,6 @@ class editableBead
         this.setDragHandler()
         this.setReleaseHandler()
 
-        @bead.mousemove(@dragHandler)
-        @bead.click(@releaseHandler)
         drawing.add(@bead)
         theEditor.addBead(@bead)
 

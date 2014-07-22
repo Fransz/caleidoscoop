@@ -33,5 +33,6 @@ class TemplateBead
         self = this
 
         @clickHandler = (evt) ->
-            new editableBead(self)
+            eBead = new EditableBead(self, "green")
+            eBead.fromTemplate()
 

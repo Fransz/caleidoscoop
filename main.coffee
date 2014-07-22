@@ -41,11 +41,6 @@ theCone = drawing.path(coneString).attr({id: "cone"}).toDefs()
 
 
 
-# background rectangle.
-theRect = drawing.rect(0, 0, 600, 600).attr({fill: "black", "pointer-events": "all"})
-
-
-
 # Angles for the mirros.
 theAngles = [0, Math.PI / 3, -Math.PI / 3 ]
 
@@ -60,6 +55,11 @@ editButton.add(drawing.text(570, 590, "edit").attr({ fill: "white", "pointer-eve
 editHandler = (evt) ->
     theCaleidoscoop.stopAnimation()
     theCaleidoscoop.clear()
+
+    for cBead in theCaleidoscoop.allBeads
+        do (cBead) ->
+            eBead = new EditableBead(cBead, cBead.hsb) 
+            eBead.fromCaleidoscoop()
     theEditor.show()
 
 

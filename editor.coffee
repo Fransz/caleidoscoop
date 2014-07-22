@@ -70,6 +70,13 @@ class caleidoscoop.Editor
     show: () ->
         @editorGroup.attr({display: "block"})
 
+
+    # Hides the editor
+    #
+    # @return void
+    hide: () ->
+        @editorGroup.attr({display: "none"})
+
     # init the editors play button
     #
     # @return void
@@ -95,7 +102,7 @@ class caleidoscoop.Editor
         @editorGroup.add(playButton)
 
         playButton.click((evt) =>
-            @editorGroup.attr({id: "test", display: "none"})
+            this.hide()
 
             theCaleidoscoop.allBeads = @allBeads
             theCaleidoscoop.addBeadToMasterGroup(bead) for bead in @allBeads
