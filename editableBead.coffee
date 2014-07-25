@@ -5,15 +5,6 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     dragHandler = null
     releaseHandler = null
 
-    fromCaleidoscoop: () ->
-        @elm.click(@pickupHandler)
-
-
-    fromTemplate: () ->
-        @elm.mousemove(@dragHandler)
-        @elm.click(@releaseHandler)
-
-
     # Constructor for the editable bead. We create it from a template bead, copy its transformation and assign
     # eventhandlers
     #

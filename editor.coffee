@@ -104,13 +104,14 @@ class caleidoscoop.Editor
         playButton.click((evt) =>
             this.hide()
 
-            # theCaleidoscoop.allBeads = @allBeads
-            for eBead in @allBeads
-                do (eBead) ->
-                    theCaleidoscoop.addBead(new CaleidoscoopBead(eBead, eBead.hsb, eBead.transform().string))
+            for bead in @allBeads
+                do (bead) ->
+                    theCaleidoscoop.addBead(new CaleidoscoopBead(bead, bead.getTransform(), bead.getColor()))
             theCaleidoscoop.addBeadToMasterGroup(bead) for bead in @allBeads
             theCaleidoscoop.makeTransformedGroups()
             theCaleidoscoop.drawChambers()
+
+            @allBeads = []
         )
 
 

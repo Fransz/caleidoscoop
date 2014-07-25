@@ -57,10 +57,11 @@ editHandler = (evt) ->
     theCaleidoscoop.stopAnimation()
     theCaleidoscoop.clear()
 
-    for cBead in theCaleidoscoop.allBeads
-        do (cBead) ->
-            eBead = new EditableBead(cBead, cBead.getColor())
-            # eBead.fromCaleidoscoop()
+    for bead in theCaleidoscoop.allBeads
+        do (bead) ->
+            new EditableBead(bead, bead.getColor())
+
+    theCaleidoscoop.allBeads = []
     theEditor.show()
 
 
