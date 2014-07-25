@@ -34,5 +34,5 @@ class caleidoscoop.TemplateBead extends caleidoscoop.Bead
 
         @clickHandler = (evt) ->
             eBead = new EditableBead(self, "green")
-            eBead.fromTemplate()
+
 

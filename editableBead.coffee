@@ -36,7 +36,12 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         this.setDragHandler()
         this.setReleaseHandler()
 
-        drawing.add(@elm)
+        if(bead instanceof TemplateBead)
+            @elm.mousemove(@dragHandler)
+            @elm.click(@releaseHandler)
+        if(bead instanceof CaleidoscoopBead)
+            @elm.click(@pickupHandler)
+
         theEditor.addBead(this)
 
     # Helper function for calculating new coordinates while dragging
