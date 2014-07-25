@@ -5,28 +5,29 @@ drawing = Snap("#drawing")
 #
 # Form definitions.
 circleForm = drawing.circle(0, 0, 30)
-circleForm.toDefs()
+circle = new Bead(circleForm.toDefs())
 
 triangleForm = drawing.polyline([[0, -30], [30, 30], [-30, 30]])
-triangleForm.toDefs()
+triangle = new Bead(triangleForm.toDefs())
 
 squareForm = drawing.rect(-30, -30, 60, 60)
-squareForm.toDefs()
+square = new Bead(squareForm.toDefs())
 
 diamondForm = drawing.polyline([[-30,0], [-20, -20], [20, -20], [30, 0], [0, 40]])
-diamondForm.toDefs()
+diamond = new Bead(diamondForm.toDefs())
 
 starForm = drawing.group()
-starForm.toDefs()
 starForm.add(drawing.polyline([[0, -30], [30, 16], [-30, 16]]))
 starForm.add(drawing.polyline([[0, 30], [30, -16], [-30, -16]]))
+star = new Bead(starForm.toDefs())
 
 wingForm = drawing.group()
 wingForm.toDefs()
 wingForm.add(drawing.ellipse(0, 0, 16, 30))
 wingForm.add(drawing.ellipse(0, 0, 30, 16))
+wing = new Bead(wingForm.toDefs())
 
-theBeads = [circleForm, triangleForm, squareForm, diamondForm, starForm, wingForm]
+theBeads = [circle, triangle, square, diamond, star, wing]
 
 
 #
@@ -56,10 +57,10 @@ editHandler = (evt) ->
     theCaleidoscoop.stopAnimation()
     theCaleidoscoop.clear()
 
-    for cBead in theCaleidoscoop.allBeads
-        do (cBead) ->
-            eBead = new EditableBead(cBead, cBead.hsb) 
-            eBead.fromCaleidoscoop()
+    # for cBead in theCaleidoscoop.allBeads
+        # do (cBead) ->
+            # eBead = new EditableBead(cBead, cBead.hsb)
+            # eBead.fromCaleidoscoop()
     theEditor.show()
 
 
@@ -75,4 +76,4 @@ editButton.click(editHandler)
 # Globals for all beads, and all mirrors.
 
 theCaleidoscoop = new caleidoscoop.Caleidoscoop theBeads, theAngles, theCone
-theEditor = new Editor(theBeads, theCaleidoscoop.allBeads)
+theEditor = new Editor theBeads, theCaleidoscoop.allBeads 

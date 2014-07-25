@@ -1,15 +1,15 @@
 caleidoscoop = caleidoscoop || {}
 
-class TemplateBead
-    bead = null
-
+class caleidoscoop.TemplateBead extends caleidoscoop.Bead
     # Constructor for a template bead.
     # We create the template bead from a definition, give it the correct position, and assign a click handler.
-    constructor: (beadDefinition) ->
-        @definition = beadDefinition
-        @bead = beadDefinition.use().attr({fill: "red"})
+    constructor: (bead) ->
+        super(bead.def)
+        @use()
+        @setColor('red')
+
         this.setClickHandler()
-        @bead.click(@clickHandler)
+        @elm.click(@clickHandler)
 
 
 
@@ -20,9 +20,9 @@ class TemplateBead
     # @param group  the group to add to.
     # @return int deltaY
     display: (offsetX, offsetY, group) ->
-        bbox = @bead.getBBox()
+        bbox = this.getBBox()
         beadX = offsetX + bbox.x / 2
-        group.add(@bead.transform("t #{beadX}, #{offsetY}"))
+        group.add(this.setTransform("t #{beadX}, #{offsetY}"))
         bbox.height + 20
 
 

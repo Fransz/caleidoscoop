@@ -6,7 +6,9 @@ class caleidoscoop.Bead
     tString: ""                     # The beads transformation string
     color: 0                         # The beads color, a hsb value.
 
-    # Construct a Bead from a definition.
+    # Construct a Bead from a svg definition element
+    #
+    # @param def  The svg definition element.
     constructor: (def) ->
         @def = def
 
@@ -18,6 +20,9 @@ class caleidoscoop.Bead
 
     getElement: () ->
         @elm
+
+    getBBox: () ->
+        @def.getBBox()
 
     setTransform: (tString) ->
         @tString = tString
