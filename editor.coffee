@@ -61,7 +61,7 @@ class caleidoscoop.Editor
     # @param bead the bead to add.
     # @return void
     addBead: (bead) ->
-        @beadGroup.add(bead)
+        @beadGroup.add(bead.getElement())
         @allBeads.push(bead)
 
     # Shows the editor

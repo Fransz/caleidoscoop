@@ -1,39 +1,43 @@
 caleidoscoop = caleidoscoop || {}
 
-class caleidoscoop.EditableBead
-    bead = null
+class caleidoscoop.EditableBead extends caleidoscoop.Bead
     pickupHandler = null
     dragHandler = null
     releaseHandler = null
 
     fromCaleidoscoop: () ->
-        @bead.click(@pickupHandler)
+        @elm.click(@pickupHandler)
 
 
     fromTemplate: () ->
-        @bead.mousemove(@dragHandler)
-        @bead.click(@releaseHandler)
+        @elm.mousemove(@dragHandler)
+        @elm.click(@releaseHandler)
 
 
     # Constructor for the editable bead. We create it from a template bead, copy its transformation and assign
     # eventhandlers
     #
     # @param templateBead   The template from which to create this editable bead.
-    constructor: (templateBead, fill) ->
-        tString = templateBead.bead.transform().string
-        matrix = templateBead.bead.transform().localMatrix
-        @bead = templateBead.definition.use().transform(tString).attr({fill: fill})
+    constructor: (bead, fill) ->
+        super(bead.def)
+        @use()
+        @setColor(fill)
+
+        tString = bead.getTransform()
+        this.setTransform(tString)
+
+        matrix = @elm.transform().localMatrix
 
         # Store the initial transformations
-        @bead.startE = matrix.e
-        @bead.startF = matrix.f
+        @startE = matrix.e
+        @startF = matrix.f
 
         this.setPickupHandler()
         this.setDragHandler()
         this.setReleaseHandler()
 
-        drawing.add(@bead)
-        theEditor.addBead(@bead)
+        drawing.add(@elm)
+        theEditor.addBead(this)
 
     # Helper function for calculating new coordinates while dragging
     #
@@ -49,17 +53,17 @@ class caleidoscoop.EditableBead
         if(isTouchSupported)
             coord.x = evt.clientX - containerX - 300
             coord.y = evt.clientY - containerY - 300
-            coord
+            return coord
 
         else if(evt.offsetX || evt.offsetX == 0)
             coord.x = evt.offsetX - 300
             coord.y = evt.offsetY - 300
-            coord
+            return coord
 
         else if(evt.layerX || evt.layerX == 0)
             coord.x = evt.layerX - 300
             coord.y = evt.layerY - 300
-            coord
+            return coord
 
     # Eventhandler for clicking on the new bead again.
     #
@@ -68,13 +72,13 @@ class caleidoscoop.EditableBead
     setPickupHandler: () ->
         self = this
         @pickupHandler = (evt) ->
-            matrix = self.bead.transform().localMatrix
-            self.bead.startE = matrix.e
-            self.bead.startF = matrix.f
+            matrix = self.elm.transform().localMatrix
+            self.startE = matrix.e
+            self.startF = matrix.f
 
-            self.bead.unclick(self.pickupHandler)
-            self.bead.click(self.releaseHandler)
-            self.bead.mousemove(self.dragHandler)
+            self.elm.unclick(self.pickupHandler)
+            self.elm.click(self.releaseHandler)
+            self.elm.mousemove(self.dragHandler)
 
 
     # Event handler for moving the new bead.
@@ -85,10 +89,10 @@ class caleidoscoop.EditableBead
         @dragHandler = (evt) ->
             coord = self.coordXY(evt)
 
-            matrix = self.bead.transform().localMatrix
+            matrix = self.elm.transform().localMatrix
             matrix.e = coord.x
             matrix.f = coord.y
-            self.bead.transform(matrix)
+            self.setTransform(matrix.toTransformString())
 
     # Event handler for releasing the bead.
     #
@@ -97,6 +101,6 @@ class caleidoscoop.EditableBead
         self = this
 
         @releaseHandler = (evt) ->
-            self.bead.unclick(self.releaseHandler)
-            self.bead.click(self.pickupHandler)
-            self.bead.unmousemove(self.dragHandler)
+            self.elm.unclick(self.releaseHandler)
+            self.elm.click(self.pickupHandler)
+            self.elm.unmousemove(self.dragHandler)
