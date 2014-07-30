@@ -24,10 +24,10 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @startE = matrix.e
         @startF = matrix.f
 
-        this.setPickupHandler()
-        this.setDragHandler()
-        this.setReleaseHandler()
-        this.setEditHandler(@enableBeadEdit)
+        this.setPickupHandler(@pickupBead)
+        this.setDragHandler(@dragBead)
+        this.setReleaseHandler(@releaseBead)
+        this.setEditHandler(@editBead)
 
         if(bead instanceof TemplateBead)
             @elm.mousemove(@dragHandler)
@@ -38,11 +38,76 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
 
         @editor.addBead(this)
 
+
+    # Eventhandler for clicking on the new bead again.
+    #
+    # @param evt The click event.
+    # @return void
+    setPickupHandler: (fn) ->
+        @pickupHandler = (evt) =>
+            fn.apply(this)
+
+
+    # Event handler for moving the new bead.
+    #
+    # @param evt The move event
+    setDragHandler: (fn) ->
+        @dragHandler = (evt) =>
+            fn.call(this, evt)
+
+    # Event handler for releasing the bead.
+    #
+    # @param evt The click event.
+    setReleaseHandler: (fn) ->
+        @releaseHandler = (evt) =>
+            fn.apply(this)
+
+
+    setEditHandler: (fn) ->
+        @editHandler = (evt) =>
+            fn.apply(this)
+
+
+    # picksup the bead
+    #
+    # @return void
+    pickupBead: () ->
+        matrix = @elm.transform().localMatrix
+        @startE = matrix.e
+        @startF = matrix.f
+
+        @elm.unclick(@pickupHandler)
+        @elm.click(@releaseHandler)
+        @elm.mousemove(@dragHandler)
+
+
+    # drags the bead
+    #
+    # @param evt the move event
+    # @return void
+    dragBead: (evt) ->
+        coord = @_coordHelper(evt)
+
+        matrix = @elm.transform().localMatrix
+        matrix.e = coord.x
+        matrix.f = coord.y
+        @setTransform(matrix.toTransformString())
+
+
+    # releases the bead
+    #
+    # @return void
+    releaseBead: () =>
+        @elm.unclick(@releaseHandler)
+        @elm.click(@pickupHandler)
+        @elm.unmousemove(@dragHandler)
+
+
     # Helper function for calculating new coordinates while dragging
     #
     # @param evt  The event.
     # @return object  An object with the new x and y coordinate.
-    coordXY: (evt) ->
+    _coordHelper: (evt) ->
         containerX = document.getElementById('canvas').offsetLeft
         containerY = document.getElementById('canvas').offsetTop
 
@@ -64,52 +129,12 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
             coord.y = evt.layerY - 300
             return coord
 
-    # Eventhandler for clicking on the new bead again.
-    #
-    # @param evt The click event.
-    # @return void
-    setPickupHandler: () ->
-        @pickupHandler = (evt) =>
-            matrix = @elm.transform().localMatrix
-            @startE = matrix.e
-            @startF = matrix.f
-
-            @elm.unclick(@pickupHandler)
-            @elm.click(@releaseHandler)
-            @elm.mousemove(@dragHandler)
-
-
-    # Event handler for moving the new bead.
-    #
-    # @param evt The move event
-    setDragHandler: () ->
-        @dragHandler = (evt) =>
-            coord = @coordXY(evt)
-
-            matrix = @elm.transform().localMatrix
-            matrix.e = coord.x
-            matrix.f = coord.y
-            @setTransform(matrix.toTransformString())
-
-    # Event handler for releasing the bead.
-    #
-    # @param evt The click event.
-    setReleaseHandler: (evt) ->
-        @releaseHandler = (evt) =>
-            @elm.unclick(@releaseHandler)
-            @elm.click(@pickupHandler)
-            @elm.unmousemove(@dragHandler)
-
-
-    setEditHandler: (fn) ->
-        @editHandler = (evt) =>
-            fn.apply(this)
 
 
     # shows and set event handlers for the bead icons.
     #
     # @return void
-    enableBeadEdit: () ->
+    editBead: () ->
         @showBeadEdit()
 
         # set event handlers for the bead.
@@ -117,20 +142,23 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @elm.unmousemove(@dragHandler)
 
         @elm.undblclick(@editHandler)
-        @setEditHandler(@disableBeadEdit)
+        @setEditHandler(@disableEditBead)
         @elm.dblclick(@editHandler)
 
 
     # hodes and unset event handlers for the bead icons.
     #
     # @return void
-    disableBeadEdit: () ->
+    disableEditBead: () ->
         @editArea.remove()
 
         # set event handlers for the bead.
         @elm.click(@pickupHandler)
-        @elm.undblclick(@disableBeadEdit)
-        @elm.dblclick(@enableBeadEdit)
+
+        @elm.undblclick(@editHandler)
+        @setEditHandler(@editBead)
+        @elm.dblclick(@editHandler)
+
 
     # _shows the edit bead icons for a given bead.
     #
