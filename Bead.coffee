@@ -28,8 +28,11 @@ class caleidoscoop.Bead
         @tString = tString
         @elm.transform(tString)
 
-    getTransform: (tString) ->
+    getTransform: () ->
         @tString
+
+    getTransformMatrix: () ->
+        @elm.transform().localMatrix
 
     setColor: (color) ->
         @color = color
