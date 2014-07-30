@@ -26,12 +26,14 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         this.setPickupHandler()
         this.setDragHandler()
         this.setReleaseHandler()
+        this.setDoubleClickHandler()
 
         if(bead instanceof TemplateBead)
             @elm.mousemove(@dragHandler)
             @elm.click(@releaseHandler)
         if(bead instanceof CaleidoscoopBead)
             @elm.click(@pickupHandler)
+        @elm.dblclick(@doubleClickHandler)
 
         theEditor.addBead(this)
 
@@ -66,37 +68,38 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     # @param evt The click event.
     # @return void
     setPickupHandler: () ->
-        self = this
-        @pickupHandler = (evt) ->
-            matrix = self.elm.transform().localMatrix
-            self.startE = matrix.e
-            self.startF = matrix.f
+        @pickupHandler = (evt) =>
+            matrix = @elm.transform().localMatrix
+            @startE = matrix.e
+            @startF = matrix.f
 
-            self.elm.unclick(self.pickupHandler)
-            self.elm.click(self.releaseHandler)
-            self.elm.mousemove(self.dragHandler)
+            @elm.unclick(@pickupHandler)
+            @elm.click(@releaseHandler)
+            @elm.mousemove(@dragHandler)
 
 
     # Event handler for moving the new bead.
     #
     # @param evt The move event
     setDragHandler: () ->
-        self = this
-        @dragHandler = (evt) ->
-            coord = self.coordXY(evt)
+        @dragHandler = (evt) =>
+            coord = @coordXY(evt)
 
-            matrix = self.elm.transform().localMatrix
+            matrix = @elm.transform().localMatrix
             matrix.e = coord.x
             matrix.f = coord.y
-            self.setTransform(matrix.toTransformString())
+            @setTransform(matrix.toTransformString())
 
     # Event handler for releasing the bead.
     #
     # @param evt The click event.
     setReleaseHandler: (evt) ->
-        self = this
+        @releaseHandler = (evt) =>
+            @elm.unclick(@releaseHandler)
+            @elm.click(@pickupHandler)
+            @elm.unmousemove(@dragHandler)
 
-        @releaseHandler = (evt) ->
-            self.elm.unclick(self.releaseHandler)
-            self.elm.click(self.pickupHandler)
-            self.elm.unmousemove(self.dragHandler)
+
+    setDoubleClickHandler: (evt) ->
+        @doubleClickHandler = (evt) =>
+            this.elm.attr({fill: "orange"})

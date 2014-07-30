@@ -30,9 +30,7 @@ class caleidoscoop.TemplateBead extends caleidoscoop.Bead
     #
     # @param evt The click event.
     setClickHandler: () ->
-        self = this
-
-        @clickHandler = (evt) ->
-            eBead = new EditableBead(self, "green")
+        @clickHandler = (evt) =>
+            eBead = new EditableBead(this, "green")
 
 
