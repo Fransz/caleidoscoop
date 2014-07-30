@@ -27,14 +27,14 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         this.setPickupHandler()
         this.setDragHandler()
         this.setReleaseHandler()
-        this.setDoubleClickHandler()
+        this.setEditHandler(@enableBeadEdit)
 
         if(bead instanceof TemplateBead)
             @elm.mousemove(@dragHandler)
             @elm.click(@releaseHandler)
         if(bead instanceof CaleidoscoopBead)
             @elm.click(@pickupHandler)
-        @elm.dblclick(@doubleClickHandler)
+        @elm.dblclick(@editHandler)
 
         @editor.addBead(this)
 
@@ -101,6 +101,103 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
             @elm.unmousemove(@dragHandler)
 
 
-    setDoubleClickHandler: (evt) ->
-        @doubleClickHandler = (evt) =>
-            @editor.enableBeadEdit(this)
+    setEditHandler: (fn) ->
+        @editHandler = (evt) =>
+            fn.apply(this)
+
+
+    # shows and set event handlers for the bead icons.
+    #
+    # @return void
+    enableBeadEdit: () ->
+        @showBeadEdit()
+
+        # set event handlers for the bead.
+        @elm.unclick(@pickupHandler)
+        @elm.unmousemove(@dragHandler)
+
+        @elm.undblclick(@editHandler)
+        @setEditHandler(@disableBeadEdit)
+        @elm.dblclick(@editHandler)
+
+
+    # hodes and unset event handlers for the bead icons.
+    #
+    # @return void
+    disableBeadEdit: () ->
+        @editArea.remove()
+
+        # set event handlers for the bead.
+        @elm.click(@pickupHandler)
+        @elm.undblclick(@disableBeadEdit)
+        @elm.dblclick(@enableBeadEdit)
+
+    # _shows the edit bead icons for a given bead.
+    #
+    # @param bead
+    # @retun void
+    # @todo: find a good way for drawing the edit box; while defining forms? creating editable beads?
+    showBeadEdit: (bead) ->
+
+        # get a bunding box big enough.
+        bbox= @getBBox()
+        c = drawing.circle(bbox.cx, bbox.cy, bbox.r0)
+        bbox = c.getBBox()
+        c.remove()
+
+        beadTransform = @getTransformMatrix()
+        beadTransform.a = beadTransform.d = 1
+        beadTransform.b = beadTransform.c = 0
+
+        @editArea = drawing.group().transform(beadTransform)
+
+        # the editBox
+        editBox = drawing.rect(bbox.x, bbox.y, bbox.width, bbox.height).attr(stroke: "orange", "stroke-width": "1px", fill: "none")
+        @editArea.add(editBox)
+
+        # the edit bar
+        editBar = drawing.rect(bbox.x, bbox.y + bbox.height, bbox.width, bbox.height / 4).attr(stroke: "orange", "stroke-width": "1px", fill: "none")
+        @editArea.add(editBar)
+
+        # The edit icons
+        @_drawEditIcons(editBox, editBar)
+
+        @editor.beadGroup.add(@editArea)
+
+
+    # internal function for showing the icons while enabeling beadEdit
+    #
+    # @param editBox  the rect around the bead
+    # @param editBar  the bar under the bead
+    # @return void
+    _drawEditIcons: (editBox, editBar) ->
+        editBoxBB = editBox.getBBox()
+        editBarBB = editBar.getBBox()
+        barIconsDeltaX = (editBarBB.width) / 4 
+
+        closeIconX = editBoxBB.x + editBoxBB.width - 20
+        closeIconY = editBoxBB.y + 17
+        closeIcon = drawing.text(closeIconX, closeIconY, "X").attr({ fill: "white"})
+        @editArea.add(closeIcon)
+
+        deleteIconX = editBarBB.x + 3
+        deleteIconY = editBarBB.y + 17
+        deleteIcon = drawing.text(deleteIconX, deleteIconY, "D").attr({ fill: "white"})
+        @editArea.add(deleteIcon)
+
+        rotateIconX = editBarBB.x + barIconsDeltaX + 3
+        rotateIconY = editBarBB.y + 17
+        rotateIcon = drawing.text(rotateIconX, rotateIconY, "R").attr({ fill: "white"})
+        @editArea.add(rotateIcon)
+
+        mirrorIconX = editBarBB.x + barIconsDeltaX * 2 + 3
+        mirrorIconY = editBarBB.y + 17
+        mirrorIcon = drawing.text(mirrorIconX, mirrorIconY, "M").attr({ fill: "white"})
+        @editArea.add(mirrorIcon)
+
+        colorIconX = editBarBB.x + barIconsDeltaX * 3 + 3
+        colorIconY = editBarBB.y + 17
+        colorIcon = drawing.text(colorIconX, colorIconY, "C").attr({ fill: "white"})
+        @editArea.add(colorIcon)
+
+
