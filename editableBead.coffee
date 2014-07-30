@@ -5,14 +5,15 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     dragHandler = null
     releaseHandler = null
 
-    # Constructor for the editable bead. We create it from a template bead, copy its transformation and assign
-    # eventhandlers
+    # Copy Constructor for an editable bead. 
+    # We create it from a template bead or a template bead
     #
     # @param templateBead   The template from which to create this editable bead.
-    constructor: (bead, fill) ->
-        super(bead.def)
-        @use()
-        @setColor(fill)
+    constructor: (bead, editor) ->
+        super(bead.def)                     # create a new bead with the beads definition.
+        @setColor(bead.getColor())
+
+        @editor = editor
 
         tString = bead.getTransform()
         this.setTransform(tString)
@@ -35,7 +36,7 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
             @elm.click(@pickupHandler)
         @elm.dblclick(@doubleClickHandler)
 
-        theEditor.addBead(this)
+        @editor.addBead(this)
 
     # Helper function for calculating new coordinates while dragging
     #
@@ -102,4 +103,4 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
 
     setDoubleClickHandler: (evt) ->
         @doubleClickHandler = (evt) =>
-            this.elm.attr({fill: "orange"})
+            @editor.enableBeadEdit(this)

@@ -11,8 +11,6 @@ class caleidoscoop.Bead
     # @param def  The svg definition element.
     constructor: (def) ->
         @def = def
-
-    use: () ->
         @elm = @def.use()
 
     getDefinition: () ->

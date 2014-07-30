@@ -40,8 +40,8 @@ class caleidoscoop.Editor
     # @return void
     _initTemplateBeads: (beadDefinitions, templateBeads) ->
         for bDef in beadDefinitions
-            do (bDef) ->
-                templateBeads.push(new TemplateBead(bDef))
+            do (bDef) =>
+                templateBeads.push(new TemplateBead(bDef, this))
 
 
     # displays the template area and the template beads.
