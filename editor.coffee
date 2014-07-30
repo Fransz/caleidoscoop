@@ -16,7 +16,7 @@ class caleidoscoop.Editor
     #
     # @param beadDefinitions  An array with all beadsDefinitions.
     # @param beadGroup An array with all beads drawn in the caleidoscoop.
-    constructor: (beadDefinitions, beadsArray) ->
+    constructor: (beadDefinitions) ->
         @editorGroup = drawing.group().attr({id: "editor", display: "none"})
         this._initPlayButton()
         this._initClearButton()
@@ -87,7 +87,7 @@ class caleidoscoop.Editor
         @editorGroup.add(clearButton)
 
         clearButton.click((evt) =>
-            bead.remove() for bead in @allBeads
+            bead.elm.remove() for bead in @allBeads
             @allBeads = []
         )
 
@@ -107,7 +107,7 @@ class caleidoscoop.Editor
             for bead in @allBeads
                 do (bead) ->
                     theCaleidoscoop.addBead(new CaleidoscoopBead(bead, bead.getTransform(), bead.getColor()))
-            theCaleidoscoop.addBeadToMasterGroup(bead) for bead in @allBeads
+            # theCaleidoscoop.addBeadToMasterGroup(bead) for bead in @allBeads
             theCaleidoscoop.makeTransformedGroups()
             theCaleidoscoop.drawChambers()
 
@@ -125,5 +125,3 @@ class caleidoscoop.Editor
         @editorGroup.add(editCircle)
         editDot = drawing.circle(@center.x, @center.y, 2).attr({fill: "white"})
         @editorGroup.add(editDot)
-
-

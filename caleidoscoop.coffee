@@ -15,11 +15,12 @@ class caleidoscoop.Caleidoscoop
 
     clipCone: null
 
+    transformedClipCones: []
 
     constructor: (beadDefinitions, angles, clipCone) ->
         @clipCone = clipCone
 
-        @masterGroup = drawing.group().attr({id: "beads"}).toDefs()
+        @masterGroup = drawing.group().attr({id: "beadsMaster"}).toDefs()
         @transformations = this.makeTransformations(angles)
 
         this.createBeads(beadDefinition, @allBeads) for beadDefinition in beadDefinitions
@@ -52,7 +53,6 @@ class caleidoscoop.Caleidoscoop
     # @param a  angle of the mirror with x-axis.
     # @return   Snap.Matrix
     makeMirror: (a) ->
-
         mirror = (k) ->
             f = 1 / (k * k + 1)
             new Snap.Matrix(f * (1 - k * k),  f * 2 * k,  f * 2 * k,  f * (k * k - 1),  0,  0)
@@ -89,7 +89,6 @@ class caleidoscoop.Caleidoscoop
         for t in transforms
             do (t) ->
                 cBead = new CaleidoscoopBead(bead, t, hsb)
-                # cBead = new CaleidoscoopBead(beadDefinition, hsb, t)
                 allBeads.push(cBead)
 
 
@@ -101,6 +100,7 @@ class caleidoscoop.Caleidoscoop
     # @return void
     addBead: (cBead) ->
         @allBeads.push(cBead)
+        @masterGroup.add(cBead.getElement())
 
 
 
@@ -134,7 +134,9 @@ class caleidoscoop.Caleidoscoop
 
         chamber = drawing.group().transform("t #{@center.x}, #{@center.y}")
         chamber.add(beadGroup)
-        chamber.attr({ clipPath: @clipCone.use().transform(beadTransform)})
+        clipCone = @clipCone.use().transform(beadTransform)
+        @transformedClipCones.push(clipCone)
+        chamber.attr({ clipPath: clipCone})
 
         @chambers.push(chamber)
 
@@ -170,5 +172,15 @@ class caleidoscoop.Caleidoscoop
      #
      # @return void.
     clear: () ->
+        @allBeads = []
+
+        @masterGroup.remove()
+        @masterGroup = drawing.group().attr({id: "beads"}).toDefs()
+
         chamber.remove() for chamber in @chambers
+        @chambers = []
+
+        clipCone.parent().remove() for clipCone in @transformedClipCones
+        @transformedClipCones = []
+
 
