@@ -64,6 +64,66 @@ class caleidoscoop.Editor
         @beadGroup.add(bead.getElement())
         @allBeads.push(bead)
 
+    # shows the edit bead icons for a given bead.
+    #
+    # @param bead
+    # @retun void
+    # @todo: find a good way for drawing the edit box; while defining forms? creating editable beads?
+    enableBeadEdit: (bead) ->
+        _drawEditIcons = (editArea, editBox, editBar) ->
+            editBoxBB = editBox.getBBox()
+            editBarBB = editBar.getBBox()
+            barIconsDeltaX = (editBarBB.width) / 4 
+
+            closeIconX = editBoxBB.x + editBoxBB.width - 20
+            closeIconY = editBoxBB.y + 17
+            closeIcon = drawing.text(closeIconX, closeIconY, "X").attr({ fill: "white"})
+            editArea.add(closeIcon)
+
+            deleteIconX = editBarBB.x + 3
+            deleteIconY = editBarBB.y + 17
+            deleteIcon = drawing.text(deleteIconX, deleteIconY, "D").attr({ fill: "white"})
+            editArea.add(deleteIcon)
+
+            rotateIconX = editBarBB.x + barIconsDeltaX + 3
+            rotateIconY = editBarBB.y + 17
+            rotateIcon = drawing.text(rotateIconX, rotateIconY, "R").attr({ fill: "white"})
+            editArea.add(rotateIcon)
+
+            mirrorIconX = editBarBB.x + barIconsDeltaX * 2 + 3
+            mirrorIconY = editBarBB.y + 17
+            mirrorIcon = drawing.text(mirrorIconX, mirrorIconY, "M").attr({ fill: "white"})
+            editArea.add(mirrorIcon)
+
+            colorIconX = editBarBB.x + barIconsDeltaX * 3 + 3
+            colorIconY = editBarBB.y + 17
+            colorIcon = drawing.text(colorIconX, colorIconY, "C").attr({ fill: "white"})
+            editArea.add(colorIcon)
+
+
+        bbox= bead.getBBox()
+        c = drawing.circle(bbox.cx, bbox.cy, bbox.r0)
+        bbox = c.getBBox()
+
+        beadTransform = bead.getTransformMatrix()
+        beadTransform.a = beadTransform.d = 1
+        beadTransform.b = beadTransform.c = 0
+
+        editArea = drawing.group().transform(beadTransform)
+
+        editBox = drawing.rect(bbox.x, bbox.y, bbox.width, bbox.height).attr(stroke: "orange", "stroke-width": "1px", fill: "none")
+        editArea.add(editBox)
+
+        # the edit bar
+        editBar = drawing.rect(bbox.x, bbox.y + bbox.height, bbox.width, bbox.height / 4).attr(stroke: "orange", "stroke-width": "1px", fill: "none")
+        editArea.add(editBar)
+
+        # The edit icons
+        _drawEditIcons(editArea, editBox, editBar)
+
+        @beadGroup.add(editArea)
+
+
     # Shows the editor
     #
     # @return void
