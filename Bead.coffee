@@ -44,7 +44,9 @@ class caleidoscoop.Bead
         @tString = m.toTransformString()
         @elm.transform(@tString)
 
+    # @TODO: the scale has to be after the rotate transformations of the bead.
     flipHorizontal: () ->
-        m = @getTransformMatrix().add(Snap.matrix().scale(-1, 1))
+        m = @getTransformMatrix()
+        m.add(Snap.matrix().scale(-1, 1))
         @tString = m.toTransformString()
         @elm.transform(@tString)
