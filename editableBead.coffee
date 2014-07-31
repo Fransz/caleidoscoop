@@ -83,6 +83,11 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
             fn.apply(this)
 
 
+    setColorHandler: (fn) ->
+        @colorHandler = (evt) =>
+            fn.apply(this)
+
+
     # picksup the bead
     #
     # @return void
@@ -180,6 +185,8 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @setEditHandler(@editBead)
         @elm.dblclick(@editHandler)
 
+        @disableColorBead(null)
+
 
     # _shows the edit bead icons for a given bead.
     #
@@ -247,6 +254,8 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         colorIconX = editBarBB.x + barIconsDeltaX * 3 + 3
         colorIconY = editBarBB.y + 17
         colorIcon = drawing.text(colorIconX, colorIconY, "C").attr({ fill: "white"})
+        @setColorHandler(@colorBead)
+        colorIcon.click(@colorHandler)
         @editArea.add(colorIcon)
 
 
@@ -275,4 +284,34 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     # Event handler for the color icon
     #
     # @return void
-    # colorBead: (evt) ->
+    colorBead: (evt) ->
+        cp = document.getElementById('colorpicker')
+        slider = document.getElementById('slider')
+        picker = document.getElementById('picker')
+
+        cp.style.display = 'block'
+
+        ColorPicker(slider, picker,
+            (hex, hsv, rgb) ->
+                console.log(hsv.h, hsv.s, hsv.v)
+                console.log(rgb.r, rgb.g, rgb.b)
+                document.body.style.backgroundColor = hex
+        )
+
+
+    # Event handler for the disabling the colorpicker
+    #
+    # @return void
+    disableColorBead: (evt) ->
+        cp = document.getElementById('colorpicker')
+        slider = document.getElementById('slider')
+        picker = document.getElementById('picker')
+
+        for n in slider.childNodes
+            do (n) =>
+                n && slider.removeChild(n)
+        for n in picker.childNodes
+            do (n) =>
+                n && picker.removeChild(n)
+        cp.style.display = 'none'
+
