@@ -109,7 +109,8 @@ class caleidoscoop.Editor
             for bead in @allBeads
                 do (bead) ->
                     theCaleidoscoop.addBead(new CaleidoscoopBead(bead, bead.getTransform(), bead.getColor()))
-            # theCaleidoscoop.addBeadToMasterGroup(bead) for bead in @allBeads
+                    bead.elm.remove()
+
             theCaleidoscoop.makeTransformedGroups()
             theCaleidoscoop.drawChambers()
 

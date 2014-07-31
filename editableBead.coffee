@@ -141,7 +141,10 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @elm.unclick(@pickupHandler)
         @elm.unmousemove(@dragHandler)
 
-        @elm.undblclick(@editHandler)
+        for b in @editor.allBeads
+            do (b) =>
+                b.elm.undblclick(b.editHandler)
+
         @setEditHandler(@disableEditBead)
         @elm.dblclick(@editHandler)
 
@@ -155,7 +158,10 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         # set event handlers for the bead.
         @elm.click(@pickupHandler)
 
-        @elm.undblclick(@editHandler)
+        for b in @editor.allBeads
+            do (b) =>
+                b.elm.dblclick(b.editHandler)
+
         @setEditHandler(@editBead)
         @elm.dblclick(@editHandler)
 
@@ -188,7 +194,7 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @editArea.add(editBar)
 
         # The edit icons
-        @_drawEditIcons(editBox, editBar)
+        @_drawEditIcons(editBar)
 
         @editor.beadGroup.add(@editArea)
 
@@ -198,15 +204,9 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     # @param editBox  the rect around the bead
     # @param editBar  the bar under the bead
     # @return void
-    _drawEditIcons: (editBox, editBar) ->
-        editBoxBB = editBox.getBBox()
+    _drawEditIcons: (editBar) ->
         editBarBB = editBar.getBBox()
         barIconsDeltaX = (editBarBB.width) / 4 
-
-        closeIconX = editBoxBB.x + editBoxBB.width - 20
-        closeIconY = editBoxBB.y + 17
-        closeIcon = drawing.text(closeIconX, closeIconY, "X").attr({ fill: "white"})
-        @editArea.add(closeIcon)
 
         deleteIconX = editBarBB.x + 3
         deleteIconY = editBarBB.y + 17
