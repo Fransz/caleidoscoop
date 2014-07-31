@@ -68,6 +68,11 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
             fn.apply(this)
 
 
+    setDeleteHandler: (fn) ->
+        @deleteHandler = (evt) =>
+            fn.apply(this)
+
+
     # picksup the bead
     #
     # @return void
@@ -211,6 +216,8 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         deleteIconX = editBarBB.x + 3
         deleteIconY = editBarBB.y + 17
         deleteIcon = drawing.text(deleteIconX, deleteIconY, "D").attr({ fill: "white"})
+        @setDeleteHandler(@deleteBead)
+        deleteIcon.click(@deleteHandler)
         @editArea.add(deleteIcon)
 
         rotateIconX = editBarBB.x + barIconsDeltaX + 3
@@ -229,3 +236,27 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @editArea.add(colorIcon)
 
 
+
+    # Event handler for the delete icon
+    #
+    # @return void
+    deleteBead: (evt) ->
+        @elm.remove()
+
+
+    # Event handler for the mirror icon
+    #
+    # @return void
+    # mirrorBead: (evt) ->
+
+
+    # Event handler for the rotate icon
+    #
+    # @return void
+    # rotateBead: (evt) ->
+
+
+    # Event handler for the color icon
+    #
+    # @return void
+    # colorBead: (evt) ->
