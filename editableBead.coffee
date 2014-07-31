@@ -83,8 +83,17 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
             fn.apply(this)
 
 
-    setColorHandler: (fn) ->
+    setColorHandler: (fn, arg) ->
         @colorHandler = (evt) =>
+            fn.call(this, arg)
+
+    setColorPickerCancelHandler: (fn) ->
+        @colorPickerCancelHandler = (evt) =>
+            fn.apply(this)
+
+
+    setColorPickerOkHandler: (fn) ->
+        @colorPickerOkHandler = (evt) =>
             fn.apply(this)
 
 
@@ -232,29 +241,29 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
 
         deleteIconX = editBarBB.x + 3
         deleteIconY = editBarBB.y + 17
-        deleteIcon = drawing.text(deleteIconX, deleteIconY, "D").attr({ fill: "white"})
+        deleteIcon = drawing.text(deleteIconX, deleteIconY, "D").attr({id: "deleteIcon",  fill: "white"})
         @setDeleteHandler(@deleteBead)
         deleteIcon.click(@deleteHandler)
         @editArea.add(deleteIcon)
 
         rotateIconX = editBarBB.x + barIconsDeltaX + 3
         rotateIconY = editBarBB.y + 17
-        rotateIcon = drawing.text(rotateIconX, rotateIconY, "R").attr({ fill: "white"})
+        rotateIcon = drawing.text(rotateIconX, rotateIconY, "R").attr({id: "rotateIcon",  fill: "white"})
         @setRotateHandler(@rotateBead)
         rotateIcon.click(@rotateHandler)
         @editArea.add(rotateIcon)
 
         mirrorIconX = editBarBB.x + barIconsDeltaX * 2 + 3
         mirrorIconY = editBarBB.y + 17
-        mirrorIcon = drawing.text(mirrorIconX, mirrorIconY, "M").attr({ fill: "white"})
+        mirrorIcon = drawing.text(mirrorIconX, mirrorIconY, "M").attr({id: "mirrorIcon",  fill: "white"})
         @setMirrorHandler(@mirrorBead)
         mirrorIcon.click(@mirrorHandler)
         @editArea.add(mirrorIcon)
 
         colorIconX = editBarBB.x + barIconsDeltaX * 3 + 3
         colorIconY = editBarBB.y + 17
-        colorIcon = drawing.text(colorIconX, colorIconY, "C").attr({ fill: "white"})
-        @setColorHandler(@colorBead)
+        colorIcon = drawing.text(colorIconX, colorIconY, "C").attr({id: "colorIcon",  fill: "white"})
+        @setColorHandler(@colorBead, colorIcon)
         colorIcon.click(@colorHandler)
         @editArea.add(colorIcon)
 
@@ -263,40 +272,66 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     # Event handler for the delete icon
     #
     # @return void
-    deleteBead: (evt) ->
+    deleteBead: () ->
         @elm.remove()
 
 
     # Event handler for the rotate icon
     #
     # @return void
-    rotateBead: (evt) ->
+    rotateBead: () ->
         @rotate(30)
 
 
     # Event handler for the mirror icon
     #
     # @return void
-    mirrorBead: (evt) ->
+    mirrorBead: () ->
         @flipHorizontal()
 
 
     # Event handler for the color icon
     #
     # @return void
-    colorBead: (evt) ->
+    colorBead: (colorIcon) ->
         cp = document.getElementById('colorpicker')
         slider = document.getElementById('slider')
         picker = document.getElementById('picker')
+        preview = document.getElementById('preview')
+        ok = document.getElementById('ok')
+        cancel = document.getElementById('cancel')
 
         cp.style.display = 'block'
 
-        ColorPicker(slider, picker,
-            (hex, hsv, rgb) ->
-                console.log(hsv.h, hsv.s, hsv.v)
-                console.log(rgb.r, rgb.g, rgb.b)
-                document.body.style.backgroundColor = hex
+        c = ColorPicker(slider, picker,
+                (hex, hsv, rgb) ->
+                    preview.style.backgroundColor = hex
+                    this.newColor = hex
+            )
+        @setColorPickerOkHandler((evt) ->
+            @setColor(c.newColor)
+            @disableColorBead()
+            colorIcon.click(@colorHandler)
         )
+        @setColorPickerCancelHandler((evt) ->
+            @setColor(c.originalColor)
+            @disableColorBead()
+            colorIcon.click(@colorHandler)
+        )
+
+        _addEventListener = (element, event, listener) ->
+            if (element.attachEvent)
+                element.attachEvent('on' + event, listener)
+            else if (element.addEventListener)
+                element.addEventListener(event, listener, false)
+
+        _addEventListener(ok, 'click', @colorPickerOkHandler)
+        _addEventListener(cancel, 'click', @colorPickerCancelHandler)
+
+        c.originalColor = @getHexColor()
+        c.setHex(@getHexColor())
+
+        colorIcon.unclick(@colorHandler)
 
 
     # Event handler for the disabling the colorpicker

@@ -36,8 +36,11 @@ class caleidoscoop.Bead
         @color = color
         @elm.attr({fill: color})
 
-    getColor: (color) ->
+    getColor: () ->
         @color
+
+    getHexColor: () ->
+        Snap.color(@color).hex
 
     rotate: (deg) ->
         m = @getTransformMatrix().add(Snap.matrix().rotate(deg, 0, 0))
