@@ -38,3 +38,13 @@ class caleidoscoop.Bead
 
     getColor: (color) ->
         @color
+
+    rotate: (deg) ->
+        m = @getTransformMatrix().add(Snap.matrix().rotate(deg, 0, 0))
+        @tString = m.toTransformString()
+        @elm.transform(@tString)
+
+    flipHorizontal: () ->
+        m = @getTransformMatrix().add(Snap.matrix().scale(-1, 1))
+        @tString = m.toTransformString()
+        @elm.transform(@tString)

@@ -73,6 +73,16 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
             fn.apply(this)
 
 
+    setRotateHandler: (fn) ->
+        @rotateHandler = (evt) =>
+            fn.apply(this)
+
+
+    setMirrorHandler: (fn) ->
+        @mirrorHandler = (evt) =>
+            fn.apply(this)
+
+
     # picksup the bead
     #
     # @return void
@@ -223,11 +233,15 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         rotateIconX = editBarBB.x + barIconsDeltaX + 3
         rotateIconY = editBarBB.y + 17
         rotateIcon = drawing.text(rotateIconX, rotateIconY, "R").attr({ fill: "white"})
+        @setRotateHandler(@rotateBead)
+        rotateIcon.click(@rotateHandler)
         @editArea.add(rotateIcon)
 
         mirrorIconX = editBarBB.x + barIconsDeltaX * 2 + 3
         mirrorIconY = editBarBB.y + 17
         mirrorIcon = drawing.text(mirrorIconX, mirrorIconY, "M").attr({ fill: "white"})
+        @setMirrorHandler(@mirrorBead)
+        mirrorIcon.click(@mirrorHandler)
         @editArea.add(mirrorIcon)
 
         colorIconX = editBarBB.x + barIconsDeltaX * 3 + 3
@@ -244,16 +258,18 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @elm.remove()
 
 
-    # Event handler for the mirror icon
-    #
-    # @return void
-    # mirrorBead: (evt) ->
-
-
     # Event handler for the rotate icon
     #
     # @return void
-    # rotateBead: (evt) ->
+    rotateBead: (evt) ->
+        @rotate(30)
+
+
+    # Event handler for the mirror icon
+    #
+    # @return void
+    mirrorBead: (evt) ->
+        @flipHorizontal()
 
 
     # Event handler for the color icon
