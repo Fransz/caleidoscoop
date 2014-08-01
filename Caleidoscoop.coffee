@@ -73,7 +73,7 @@ class caleidoscoop.Caleidoscoop
     #
     # @param beadDef  The definition of the bead.
     # @return void
-    createBeads: (bead, allBeads) ->
+    createBeads: (bead) ->
         _positionX = (x) -> x - bead.getBBox().x / 2
         _positionY = (y) -> y - bead.getBBox().y / 2
 
@@ -83,12 +83,9 @@ class caleidoscoop.Caleidoscoop
         centers = []
         centers.push { x: Math.round(x * Math.random() * @center.x), y: Math.round(y * Math.random() * @center.y) } for y in [-1, 1] for x in [-1, 1]
 
-        for c in centers
-            do (c) ->
-                allBeads.push(
-                    theCaleidoscoopBeadFactory.copyBead(bead, rotation, hsb, _positionX(c.x), _positionY(c.y))
-                )
-
+        @allBeads.push(
+            theCaleidoscoopBeadFactory.copyBead(bead, rotation, hsb, _positionX(c.x), _positionY(c.y))
+        ) for c in centers
 
 
 
@@ -96,9 +93,9 @@ class caleidoscoop.Caleidoscoop
     #
     # @param bead  The bead.
     # @return void
-    addBead: (cBead) ->
-        @allBeads.push(cBead)
-        @masterGroup.add(cBead.getGrp())
+    addBead: (bead) ->
+        @allBeads.push(bead)
+        bead.addTo(@mastergroup)
 
 
 

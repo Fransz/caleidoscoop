@@ -22,16 +22,20 @@ class caleidoscoop.Editor
         this._initClearButton()
         this._initBorders()
 
+        templateGroupOffsetX = 450
+        templateGroupOffsetY = -260
+        templateGroupTransform = "t #{@center.x + templateGroupOffsetX}, #{@center.y + templateGroupOffsetY}"
         @templateGroup = drawing.group().attr({id: "templates"})
-        @templateGroup.transform("t #{@center.x}, #{@center.y}")
+        @templateGroup.transform(templateGroupTransform)
         @editorGroup.add(@templateGroup)
 
         @beadGroup = drawing.group().attr({id: "beads"})
         @beadGroup.transform("t #{@center.x}, #{@center.y}")
+
         @editorGroup.add(@beadGroup)
 
         this._initTemplateBeads(beadDefinitions, @templateBeads)
-        this.displayTemplateBeads(@templateGroup)
+        # this.displayTemplateBeads(@templateGroup)
 
 
     # init the template beads while constructing the object.
@@ -39,21 +43,28 @@ class caleidoscoop.Editor
     # @param beadDefinitions Definitions for the template beads.
     # @return void
     _initTemplateBeads: (beadDefinitions, templateBeads) ->
-        for bDef in beadDefinitions
-            do (bDef) =>
-                templateBeads.push(theTemplateBeadFactory.copyBead(bDef, this))
+        deltaY = 0
+        for b in beadDefinitions
+            do (b) =>
+                _b = theTemplateBeadFactory.copyBead(b, 0, deltaY, this)
+                templateBeads.push(_b)
+                _b.addTo(@templateGroup)
+                deltaY += _b.getBBox().height + 20
+        
 
 
     # displays the template area and the template beads.
     #
     # @return void.
     displayTemplateBeads: (templateGroup) ->
-        offsetX = 400
-        offsetY = -260
-
         for tBead in @templateBeads
             do (tBead) ->
                 offsetY += tBead.display(offsetX, offsetY, templateGroup)
+
+        bbox = this.getBBox()
+        beadX = offsetX + bbox.x / 2
+        group.add(this.setTransform("t #{beadX}, #{offsetY}"))
+        bbox.height + 20
 
 
     # addBead adds an use element to the allBeads area, and displays it.

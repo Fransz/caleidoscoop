@@ -29,6 +29,9 @@ class caleidoscoop.Bead
     getGrp: () ->
         @grp
 
+    addTo: (grp) ->
+        grp.add(@grp)
+
     setTransform: (tString) ->
         @tString = tString
         @elm.transform(tString)
