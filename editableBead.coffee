@@ -303,7 +303,7 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
 
         cp.style.display = 'block'
 
-        c = ColorPicker(slider, picker,
+        c = new ColorPicker(slider, picker,
                 (hex, hsv, rgb) ->
                     preview.style.backgroundColor = hex
                     this.newColor = hex
@@ -341,6 +341,8 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         cp = document.getElementById('colorpicker')
         slider = document.getElementById('slider')
         picker = document.getElementById('picker')
+        ok = document.getElementById('ok')
+        cancel = document.getElementById('cancel')
 
         for n in slider.childNodes
             do (n) =>
@@ -348,5 +350,15 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         for n in picker.childNodes
             do (n) =>
                 n && picker.removeChild(n)
+
+        # @Todo how to correct remove the event,
+        ok.removeEventListener('click', @colorPickerOkHandler, false)
+        cancel.removeEventListener('click', @colorPickerCancelHandler, false)
+        ok.onclick = null
+        cancel.onclick = null
+        @setColorPickerCancelHandler((evt) -> )
+        @setColorPickerOkHandler((evt) -> )
+
         cp.style.display = 'none'
+
 
