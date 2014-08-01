@@ -13,10 +13,6 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         super(defElement, options)
         @editor = options.editor || null
 
-        # @Todo do we need this?
-        matrix = @elm.transform().localMatrix
-        @startE = matrix.e
-        @startF = matrix.f
 
     # Eventhandler for clicking on the new bead again.
     #
@@ -80,10 +76,6 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     #
     # @return void
     pickupBead: () ->
-        matrix = @elm.transform().localMatrix
-        @startE = matrix.e
-        @startF = matrix.f
-
         @elm.unclick(@pickupHandler)
         @elm.click(@releaseHandler)
         @elm.mousemove(@dragHandler)
@@ -96,10 +88,10 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     dragBead: (evt) ->
         coord = @_coordHelper(evt)
 
-        matrix = @elm.transform().localMatrix
+        matrix = @grp.transform().localMatrix
         matrix.e = coord.x
         matrix.f = coord.y
-        @setTransform(matrix.toTransformString())
+        @grp.transform(matrix.toTransformString())
 
 
     # releases the bead
