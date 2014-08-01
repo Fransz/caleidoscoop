@@ -40,8 +40,8 @@ class caleidoscoop.Editor
     # @return void
     _initTemplateBeads: (beadDefinitions, templateBeads) ->
         for bDef in beadDefinitions
-            do (bDef) ->
-                templateBeads.push(new TemplateBead(bDef))
+            do (bDef) =>
+                templateBeads.push(new TemplateBead(bDef, this))
 
 
     # displays the template area and the template beads.
@@ -63,6 +63,8 @@ class caleidoscoop.Editor
     addBead: (bead) ->
         @beadGroup.add(bead.getElement())
         @allBeads.push(bead)
+
+
 
     # Shows the editor
     #
@@ -107,7 +109,9 @@ class caleidoscoop.Editor
             for bead in @allBeads
                 do (bead) ->
                     theCaleidoscoop.addBead(new CaleidoscoopBead(bead, bead.getTransform(), bead.getColor()))
-            # theCaleidoscoop.addBeadToMasterGroup(bead) for bead in @allBeads
+                    bead.elm.remove()
+                    bead.disableColorBead(null)
+
             theCaleidoscoop.makeTransformedGroups()
             theCaleidoscoop.drawChambers()
 

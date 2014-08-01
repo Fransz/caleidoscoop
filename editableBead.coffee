@@ -5,14 +5,15 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     dragHandler = null
     releaseHandler = null
 
-    # Constructor for the editable bead. We create it from a template bead, copy its transformation and assign
-    # eventhandlers
+    # Copy Constructor for an editable bead. 
+    # We create it from a template bead or a template bead
     #
     # @param templateBead   The template from which to create this editable bead.
-    constructor: (bead, fill) ->
-        super(bead.def)
-        @use()
-        @setColor(fill)
+    constructor: (bead, editor) ->
+        super(bead.def)                     # create a new bead with the beads definition.
+        @setColor(bead.getColor())
+
+        @editor = editor
 
         tString = bead.getTransform()
         this.setTransform(tString)
@@ -23,23 +24,119 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @startE = matrix.e
         @startF = matrix.f
 
-        this.setPickupHandler()
-        this.setDragHandler()
-        this.setReleaseHandler()
+        this.setPickupHandler(@pickupBead)
+        this.setDragHandler(@dragBead)
+        this.setReleaseHandler(@releaseBead)
+        this.setEditHandler(@editBead)
 
         if(bead instanceof TemplateBead)
             @elm.mousemove(@dragHandler)
             @elm.click(@releaseHandler)
         if(bead instanceof CaleidoscoopBead)
             @elm.click(@pickupHandler)
+        @elm.dblclick(@editHandler)
 
-        theEditor.addBead(this)
+        @editor.addBead(this)
+
+
+    # Eventhandler for clicking on the new bead again.
+    #
+    # @param evt The click event.
+    # @return void
+    setPickupHandler: (fn) ->
+        @pickupHandler = (evt) =>
+            fn.apply(this)
+
+
+    # Event handler for moving the new bead.
+    #
+    # @param evt The move event
+    setDragHandler: (fn) ->
+        @dragHandler = (evt) =>
+            fn.call(this, evt)
+
+    # Event handler for releasing the bead.
+    #
+    # @param evt The click event.
+    setReleaseHandler: (fn) ->
+        @releaseHandler = (evt) =>
+            fn.apply(this)
+
+
+    setEditHandler: (fn) ->
+        @editHandler = (evt) =>
+            fn.apply(this)
+
+
+    setDeleteHandler: (fn) ->
+        @deleteHandler = (evt) =>
+            fn.apply(this)
+
+
+    setRotateHandler: (fn) ->
+        @rotateHandler = (evt) =>
+            fn.apply(this)
+
+
+    setMirrorHandler: (fn) ->
+        @mirrorHandler = (evt) =>
+            fn.apply(this)
+
+
+    setColorHandler: (fn, arg) ->
+        @colorHandler = (evt) =>
+            fn.call(this, arg)
+
+    setColorPickerCancelHandler: (fn) ->
+        @colorPickerCancelHandler = (evt) =>
+            fn.apply(this)
+
+
+    setColorPickerOkHandler: (fn) ->
+        @colorPickerOkHandler = (evt) =>
+            fn.apply(this)
+
+
+    # picksup the bead
+    #
+    # @return void
+    pickupBead: () ->
+        matrix = @elm.transform().localMatrix
+        @startE = matrix.e
+        @startF = matrix.f
+
+        @elm.unclick(@pickupHandler)
+        @elm.click(@releaseHandler)
+        @elm.mousemove(@dragHandler)
+
+
+    # drags the bead
+    #
+    # @param evt the move event
+    # @return void
+    dragBead: (evt) ->
+        coord = @_coordHelper(evt)
+
+        matrix = @elm.transform().localMatrix
+        matrix.e = coord.x
+        matrix.f = coord.y
+        @setTransform(matrix.toTransformString())
+
+
+    # releases the bead
+    #
+    # @return void
+    releaseBead: () =>
+        @elm.unclick(@releaseHandler)
+        @elm.click(@pickupHandler)
+        @elm.unmousemove(@dragHandler)
+
 
     # Helper function for calculating new coordinates while dragging
     #
     # @param evt  The event.
     # @return object  An object with the new x and y coordinate.
-    coordXY: (evt) ->
+    _coordHelper: (evt) ->
         containerX = document.getElementById('canvas').offsetLeft
         containerY = document.getElementById('canvas').offsetTop
 
@@ -61,42 +158,207 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
             coord.y = evt.layerY - 300
             return coord
 
-    # Eventhandler for clicking on the new bead again.
+
+
+    # shows and set event handlers for the bead icons.
     #
-    # @param evt The click event.
     # @return void
-    setPickupHandler: () ->
-        self = this
-        @pickupHandler = (evt) ->
-            matrix = self.elm.transform().localMatrix
-            self.startE = matrix.e
-            self.startF = matrix.f
+    editBead: () ->
+        @showBeadEdit()
 
-            self.elm.unclick(self.pickupHandler)
-            self.elm.click(self.releaseHandler)
-            self.elm.mousemove(self.dragHandler)
+        # set event handlers for the bead.
+        @elm.unclick(@pickupHandler)
+        @elm.unmousemove(@dragHandler)
+
+        for b in @editor.allBeads
+            do (b) =>
+                b.elm.undblclick(b.editHandler)
+
+        @setEditHandler(@disableEditBead)
+        @elm.dblclick(@editHandler)
 
 
-    # Event handler for moving the new bead.
+    # hodes and unset event handlers for the bead icons.
     #
-    # @param evt The move event
-    setDragHandler: () ->
-        self = this
-        @dragHandler = (evt) ->
-            coord = self.coordXY(evt)
+    # @return void
+    disableEditBead: () ->
+        @editArea.remove()
 
-            matrix = self.elm.transform().localMatrix
-            matrix.e = coord.x
-            matrix.f = coord.y
-            self.setTransform(matrix.toTransformString())
+        # set event handlers for the bead.
+        @elm.click(@pickupHandler)
 
-    # Event handler for releasing the bead.
+        for b in @editor.allBeads
+            do (b) =>
+                b.elm.dblclick(b.editHandler)
+
+        @setEditHandler(@editBead)
+        @elm.dblclick(@editHandler)
+
+        @disableColorBead(null)
+
+
+    # _shows the edit bead icons for a given bead.
     #
-    # @param evt The click event.
-    setReleaseHandler: (evt) ->
-        self = this
+    # @param bead
+    # @retun void
+    # @todo: find a good way for drawing the edit box; while defining forms? creating editable beads?
+    showBeadEdit: (bead) ->
 
-        @releaseHandler = (evt) ->
-            self.elm.unclick(self.releaseHandler)
-            self.elm.click(self.pickupHandler)
-            self.elm.unmousemove(self.dragHandler)
+        # get a bunding box big enough.
+        bbox= @getBBox()
+        c = drawing.circle(bbox.cx, bbox.cy, bbox.r0)
+        bbox = c.getBBox()
+        c.remove()
+
+        beadTransform = @getTransformMatrix()
+        beadTransform.a = beadTransform.d = 1
+        beadTransform.b = beadTransform.c = 0
+
+        @editArea = drawing.group().transform(beadTransform)
+
+        # the editBox
+        editBox = drawing.rect(bbox.x, bbox.y, bbox.width, bbox.height).attr(stroke: "orange", "stroke-width": "1px", fill: "none")
+        @editArea.add(editBox)
+
+        # the edit bar
+        editBar = drawing.rect(bbox.x, bbox.y + bbox.height, bbox.width, bbox.height / 4).attr(stroke: "orange", "stroke-width": "1px", fill: "none")
+        @editArea.add(editBar)
+
+        # The edit icons
+        @_drawEditIcons(editBar)
+
+        @editor.beadGroup.add(@editArea)
+
+
+    # internal function for showing the icons while enabeling beadEdit
+    #
+    # @param editBox  the rect around the bead
+    # @param editBar  the bar under the bead
+    # @return void
+    _drawEditIcons: (editBar) ->
+        editBarBB = editBar.getBBox()
+        barIconsDeltaX = (editBarBB.width) / 4 
+
+        deleteIconX = editBarBB.x + 3
+        deleteIconY = editBarBB.y + 17
+        deleteIcon = drawing.text(deleteIconX, deleteIconY, "D").attr({id: "deleteIcon",  fill: "white"})
+        @setDeleteHandler(@deleteBead)
+        deleteIcon.click(@deleteHandler)
+        @editArea.add(deleteIcon)
+
+        rotateIconX = editBarBB.x + barIconsDeltaX + 3
+        rotateIconY = editBarBB.y + 17
+        rotateIcon = drawing.text(rotateIconX, rotateIconY, "R").attr({id: "rotateIcon",  fill: "white"})
+        @setRotateHandler(@rotateBead)
+        rotateIcon.click(@rotateHandler)
+        @editArea.add(rotateIcon)
+
+        mirrorIconX = editBarBB.x + barIconsDeltaX * 2 + 3
+        mirrorIconY = editBarBB.y + 17
+        mirrorIcon = drawing.text(mirrorIconX, mirrorIconY, "M").attr({id: "mirrorIcon",  fill: "white"})
+        @setMirrorHandler(@mirrorBead)
+        mirrorIcon.click(@mirrorHandler)
+        @editArea.add(mirrorIcon)
+
+        colorIconX = editBarBB.x + barIconsDeltaX * 3 + 3
+        colorIconY = editBarBB.y + 17
+        colorIcon = drawing.text(colorIconX, colorIconY, "C").attr({id: "colorIcon",  fill: "white"})
+        @setColorHandler(@colorBead, colorIcon)
+        colorIcon.click(@colorHandler)
+        @editArea.add(colorIcon)
+
+
+
+    # Event handler for the delete icon
+    #
+    # @return void
+    deleteBead: () ->
+        @elm.remove()
+
+
+    # Event handler for the rotate icon
+    #
+    # @return void
+    rotateBead: () ->
+        @rotate(30)
+
+
+    # Event handler for the mirror icon
+    #
+    # @return void
+    mirrorBead: () ->
+        @flipHorizontal()
+
+
+    # Event handler for the color icon
+    #
+    # @return void
+    colorBead: (colorIcon) ->
+        cp = document.getElementById('colorpicker')
+        slider = document.getElementById('slider')
+        picker = document.getElementById('picker')
+        preview = document.getElementById('preview')
+        ok = document.getElementById('ok')
+        cancel = document.getElementById('cancel')
+
+        cp.style.display = 'block'
+
+        c = new ColorPicker(slider, picker,
+                (hex, hsv, rgb) ->
+                    preview.style.backgroundColor = hex
+                    this.newColor = hex
+            )
+        @setColorPickerOkHandler((evt) ->
+            @setColor(c.newColor)
+            @disableColorBead()
+            colorIcon.click(@colorHandler)
+        )
+        @setColorPickerCancelHandler((evt) ->
+            @setColor(c.originalColor)
+            @disableColorBead()
+            colorIcon.click(@colorHandler)
+        )
+
+        _addEventListener = (element, event, listener) ->
+            if (element.attachEvent)
+                element.attachEvent('on' + event, listener)
+            else if (element.addEventListener)
+                element.addEventListener(event, listener, false)
+
+        _addEventListener(ok, 'click', @colorPickerOkHandler)
+        _addEventListener(cancel, 'click', @colorPickerCancelHandler)
+
+        c.originalColor = @getHexColor()
+        c.setHex(@getHexColor())
+
+        colorIcon.unclick(@colorHandler)
+
+
+    # Event handler for the disabling the colorpicker
+    #
+    # @return void
+    disableColorBead: (evt) ->
+        cp = document.getElementById('colorpicker')
+        slider = document.getElementById('slider')
+        picker = document.getElementById('picker')
+        ok = document.getElementById('ok')
+        cancel = document.getElementById('cancel')
+
+        for n in slider.childNodes
+            do (n) =>
+                n && slider.removeChild(n)
+        for n in picker.childNodes
+            do (n) =>
+                n && picker.removeChild(n)
+
+        # @Todo how to correct remove the event,
+        ok.removeEventListener('click', @colorPickerOkHandler, false)
+        cancel.removeEventListener('click', @colorPickerCancelHandler, false)
+        ok.onclick = null
+        cancel.onclick = null
+        @setColorPickerCancelHandler((evt) -> )
+        @setColorPickerOkHandler((evt) -> )
+
+        cp.style.display = 'none'
+
+

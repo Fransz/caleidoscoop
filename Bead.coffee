@@ -11,8 +11,6 @@ class caleidoscoop.Bead
     # @param def  The svg definition element.
     constructor: (def) ->
         @def = def
-
-    use: () ->
         @elm = @def.use()
 
     getDefinition: () ->
@@ -28,12 +26,30 @@ class caleidoscoop.Bead
         @tString = tString
         @elm.transform(tString)
 
-    getTransform: (tString) ->
+    getTransform: () ->
         @tString
+
+    getTransformMatrix: () ->
+        @elm.transform().localMatrix
 
     setColor: (color) ->
         @color = color
         @elm.attr({fill: color})
 
-    getColor: (color) ->
+    getColor: () ->
         @color
+
+    getHexColor: () ->
+        Snap.color(@color).hex
+
+    rotate: (deg) ->
+        m = @getTransformMatrix().add(Snap.matrix().rotate(deg, 0, 0))
+        @tString = m.toTransformString()
+        @elm.transform(@tString)
+
+    # @TODO: the scale has to be after the rotate transformations of the bead.
+    flipHorizontal: () ->
+        m = @getTransformMatrix()
+        m.add(Snap.matrix().scale(-1, 1))
+        @tString = m.toTransformString()
+        @elm.transform(@tString)

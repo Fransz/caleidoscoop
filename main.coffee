@@ -27,6 +27,12 @@ wingForm.add(drawing.ellipse(0, 0, 16, 30))
 wingForm.add(drawing.ellipse(0, 0, 30, 16))
 wing = new Bead(wingForm.toDefs())
 
+ellForm = drawing.group().attr({id: "ell"})
+ellForm.add(drawing.rect(-20, -20, 10, 40))
+ellForm.add(drawing.rect(-20, 20, 40, 10))
+ellForm.add(drawing.circle(0, 0, 5))
+ell = new Bead(ellForm.toDefs())
+
 theBeads = [circle, triangle, square, diamond, star, wing]
 
 
@@ -58,7 +64,7 @@ editHandler = (evt) ->
 
     for bead in theCaleidoscoop.allBeads
         do (bead) ->
-            new EditableBead(bead, bead.getColor())
+            new EditableBead(bead, theEditor)
 
     theCaleidoscoop.clear()
     theEditor.show()

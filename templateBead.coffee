@@ -3,10 +3,11 @@ caleidoscoop = caleidoscoop || {}
 class caleidoscoop.TemplateBead extends caleidoscoop.Bead
     # Constructor for a template bead.
     # We create the template bead from a definition, give it the correct position, and assign a click handler.
-    constructor: (bead) ->
+    constructor: (bead, editor) ->
         super(bead.def)
-        @use()
         @setColor('red')
+
+        @editor = editor
 
         this.setClickHandler()
         @elm.click(@clickHandler)
@@ -30,9 +31,9 @@ class caleidoscoop.TemplateBead extends caleidoscoop.Bead
     #
     # @param evt The click event.
     setClickHandler: () ->
-        self = this
-
-        @clickHandler = (evt) ->
-            eBead = new EditableBead(self, "green")
+        @clickHandler = (evt) =>
+            eBead = new EditableBead(this, @editor)
+            eBead.setColor("green")
+            return eBead
 
 
