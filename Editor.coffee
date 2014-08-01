@@ -85,7 +85,7 @@ class caleidoscoop.Editor
         @editorGroup.add(clearButton)
 
         clearButton.click((evt) =>
-            bead.elm.remove() for bead in @allBeads
+            bead.remove() for bead in @allBeads
             @allBeads = []
         )
 

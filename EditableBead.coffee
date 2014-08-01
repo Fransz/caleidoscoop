@@ -173,8 +173,7 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     # @retun void
     # @todo: find a good way for drawing the edit box; while defining forms? creating editable beads?
     showBeadEdit: (bead) ->
-
-        # get a bunding box big enough.
+        # get a bounding box big enough.
         bbox= @getBBox()
         c = drawing.circle(bbox.cx, bbox.cy, bbox.r0)
         bbox = c.getBBox()
@@ -185,19 +184,15 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         beadTransform.b = beadTransform.c = 0
 
         @editArea = drawing.group().transform(beadTransform)
+        @grp.add(@editArea)
 
-        # the editBox
         editBox = drawing.rect(bbox.x, bbox.y, bbox.width, bbox.height).attr(stroke: "orange", "stroke-width": "1px", fill: "none")
         @editArea.add(editBox)
 
-        # the edit bar
         editBar = drawing.rect(bbox.x, bbox.y + bbox.height, bbox.width, bbox.height / 4).attr(stroke: "orange", "stroke-width": "1px", fill: "none")
         @editArea.add(editBar)
 
-        # The edit icons
         @_drawEditIcons(editBar)
-
-        @editor.beadGroup.add(@editArea)
 
 
     # internal function for showing the icons while enabeling beadEdit
