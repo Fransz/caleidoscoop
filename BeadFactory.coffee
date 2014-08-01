@@ -1,7 +1,5 @@
 caleidoscoop = caleidoscoop || {}
 
-# Factory class for copying a existing bead.
-#
 class caleidoscoop.BeadFactory
     copyBead: (b) ->
         new Bead(b.getDefinition(), {})
@@ -12,12 +10,17 @@ class caleidoscoop.BeadFactory
 caleidoscoop.theBeadFactory = new caleidoscoop.BeadFactory()
 
 
+
 class caleidoscoop.CaleidoscoopBeadFactory
-    copyBead: (b, transform, color) ->
-        options = {transform: transform, color: color}
+    copyBead: (b, transform, color, positionX, positionY) ->
+        options = {
+            transform: transform, color: color,
+            positionX: positionX, positionY: positionY
+        }
         new CaleidoscoopBead(b.getDefinition(), options)
 
 caleidoscoop.theCaleidoscoopBeadFactory = new caleidoscoop.CaleidoscoopBeadFactory()
+
 
 
 class caleidoscoop.TemplateBeadFactory
@@ -33,16 +36,12 @@ class caleidoscoop.TemplateBeadFactory
 caleidoscoop.theTemplateBeadFactory = new caleidoscoop.TemplateBeadFactory()
 
 
+
 class caleidoscoop.EditorBeadFactory
     _copyBead: (b, editor) ->
         options = {color: b.getColor(), transform: b.getTransform(), editor: editor}
         _b = new EditableBead(b.getDefinition(), options)
 
-
-        # @Todo do we need this?
-        matrix = _b.elm.transform().localMatrix
-        _b.startE = matrix.e
-        _b.startF = matrix.f
 
         _b.setPickupHandler(_b.pickupBead)
         _b.setDragHandler(_b.dragBead)

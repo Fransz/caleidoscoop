@@ -74,22 +74,20 @@ class caleidoscoop.Caleidoscoop
     # @param beadDef  The definition of the bead.
     # @return void
     createBeads: (bead, allBeads) ->
+        _positionX = (x) -> x - bead.getBBox().x / 2
+        _positionY = (y) -> y - bead.getBBox().y / 2
+
         rotation = "r" + Math.round(360 * Math.random()) + ",0,0"
+        hsb = "hsb(".concat(Math.random(), ",.75", ", .75)")
 
         centers = []
         centers.push { x: Math.round(x * Math.random() * @center.x), y: Math.round(y * Math.random() * @center.y) } for y in [-1, 1] for x in [-1, 1]
 
-        bbox = bead.getBBox()
-        translatex = (x) -> x - bbox.x / 2
-        translatey = (y) -> y - bbox.y / 2
-        transforms = ("t#{translatex(c.x)},#{translatey(c.y)}" + rotation for c in centers)
-
-        hsb = "hsb(".concat(Math.random(), ",.75", ", .75)")
-
-        for t in transforms
-            do (t) ->
-                cBead = theCaleidoscoopBeadFactory.copyBead(bead, t, hsb)
-                allBeads.push(cBead)
+        for c in centers
+            do (c) ->
+                allBeads.push(
+                    theCaleidoscoopBeadFactory.copyBead(bead, rotation, hsb, _positionX(c.x), _positionY(c.y))
+                )
 
 
 
@@ -100,7 +98,7 @@ class caleidoscoop.Caleidoscoop
     # @return void
     addBead: (cBead) ->
         @allBeads.push(cBead)
-        @masterGroup.add(cBead.getElement())
+        @masterGroup.add(cBead.getGrp())
 
 
 
@@ -109,7 +107,7 @@ class caleidoscoop.Caleidoscoop
     # @param bead  The bead.
     # @return void.
     addBeadToMasterGroup: (cBead) ->
-        @masterGroup.add(cBead.getElement())
+        @masterGroup.add(cBead.getGrp())
 
 
 

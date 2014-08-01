@@ -10,9 +10,13 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     #
     # @param templateBead   The template from which to create this editable bead.
     constructor: (defElement, options) ->
-        @editor = options.editor || null
         super(defElement, options)
+        @editor = options.editor || null
 
+        # @Todo do we need this?
+        matrix = @elm.transform().localMatrix
+        @startE = matrix.e
+        @startF = matrix.f
 
     # Eventhandler for clicking on the new bead again.
     #

@@ -1,13 +1,14 @@
 caleidoscoop = caleidoscoop || {}
 
 class caleidoscoop.Bead
-    def: null                       # The beads defining element.
-    elm: null                       # The beads use element.
-    tString: ""                     # The beads transformation string
-    color: ""                       # The beads color, a string.
-
     constructor: (@def, options) ->
         @elm = @def.use()
+        @grp = drawing.group()
+        @grp.add(@elm)
+
+        @posX = options.positionX || 0
+        @posY = options.positionY || 0
+        @grp.transform("t #{@posX}, #{@posY}")
 
         @tString = options.transform || ""
         @elm.attr({transform: @tString})
@@ -24,6 +25,9 @@ class caleidoscoop.Bead
 
     getBBox: () ->
         @def.getBBox()
+
+    getGrp: () ->
+        @grp
 
     setTransform: (tString) ->
         @tString = tString
