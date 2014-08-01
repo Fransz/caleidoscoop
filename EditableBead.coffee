@@ -9,34 +9,9 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     # We create it from a template bead or a template bead
     #
     # @param templateBead   The template from which to create this editable bead.
-    constructor: (bead, editor) ->
-        super(bead.def)                     # create a new bead with the beads definition.
-        @setColor(bead.getColor())
-
-        @editor = editor
-
-        tString = bead.getTransform()
-        this.setTransform(tString)
-
-        matrix = @elm.transform().localMatrix
-
-        # Store the initial transformations
-        @startE = matrix.e
-        @startF = matrix.f
-
-        this.setPickupHandler(@pickupBead)
-        this.setDragHandler(@dragBead)
-        this.setReleaseHandler(@releaseBead)
-        this.setEditHandler(@editBead)
-
-        if(bead instanceof TemplateBead)
-            @elm.mousemove(@dragHandler)
-            @elm.click(@releaseHandler)
-        if(bead instanceof CaleidoscoopBead)
-            @elm.click(@pickupHandler)
-        @elm.dblclick(@editHandler)
-
-        @editor.addBead(this)
+    constructor: (defElement, options) ->
+        @editor = options.editor || null
+        super(defElement, options)
 
 
     # Eventhandler for clicking on the new bead again.

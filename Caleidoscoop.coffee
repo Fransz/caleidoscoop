@@ -88,7 +88,7 @@ class caleidoscoop.Caleidoscoop
 
         for t in transforms
             do (t) ->
-                cBead = new CaleidoscoopBead(bead, t, hsb)
+                cBead = theCaleidoscoopBeadFactory.copyBead(bead, t, hsb)
                 allBeads.push(cBead)
 
 

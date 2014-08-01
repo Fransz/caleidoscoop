@@ -5,33 +5,33 @@ drawing = Snap("#drawing")
 #
 # Form definitions.
 circleForm = drawing.circle(0, 0, 30).attr({id: "circleForm"})
-circle = new Bead(circleForm.toDefs())
+circle = theBeadFactory.createBead(circleForm.toDefs())
 
 triangleForm = drawing.polyline([[0, -30], [30, 30], [-30, 30]]).attr({id: "triangleForm"})
-triangle = new Bead(triangleForm.toDefs())
+triangle = theBeadFactory.createBead(triangleForm.toDefs())
 
 squareForm = drawing.rect(-30, -30, 60, 60).attr({id: "squareForm"})
-square = new Bead(squareForm.toDefs())
+square = theBeadFactory.createBead(squareForm.toDefs())
 
 diamondForm = drawing.polyline([[-30,0], [-20, -20], [20, -20], [30, 0], [0, 40]]).attr({id: "diamondForm"})
-diamond = new Bead(diamondForm.toDefs())
+diamond = theBeadFactory.createBead(diamondForm.toDefs())
 
 starForm = drawing.group().attr({id: "starForm"})
 starForm.add(drawing.polyline([[0, -30], [30, 16], [-30, 16]]))
 starForm.add(drawing.polyline([[0, 30], [30, -16], [-30, -16]]))
-star = new Bead(starForm.toDefs())
+star = theBeadFactory.createBead(starForm.toDefs())
 
 wingForm = drawing.group().attr({id: "wingForm"})
 wingForm.toDefs()
 wingForm.add(drawing.ellipse(0, 0, 16, 30))
 wingForm.add(drawing.ellipse(0, 0, 30, 16))
-wing = new Bead(wingForm.toDefs())
+wing = theBeadFactory.createBead(wingForm.toDefs())
 
 ellForm = drawing.group().attr({id: "ell"})
 ellForm.add(drawing.rect(-20, -20, 10, 40))
 ellForm.add(drawing.rect(-20, 20, 40, 10))
 ellForm.add(drawing.circle(0, 0, 5))
-ell = new Bead(ellForm.toDefs())
+ell = theBeadFactory.createBead(ellForm.toDefs())
 
 theBeads = [circle, triangle, square, diamond, star, wing]
 
@@ -64,7 +64,7 @@ editHandler = (evt) ->
 
     for bead in theCaleidoscoop.allBeads
         do (bead) ->
-            new EditableBead(bead, theEditor)
+            theEditableBeadFactory.copyBeadFromCaleidoscoopBead(bead, theEditor)
 
     theCaleidoscoop.clear()
     theEditor.show()

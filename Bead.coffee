@@ -4,14 +4,17 @@ class caleidoscoop.Bead
     def: null                       # The beads defining element.
     elm: null                       # The beads use element.
     tString: ""                     # The beads transformation string
-    color: 0                         # The beads color, a hsb value.
+    color: ""                       # The beads color, a string.
 
-    # Construct a Bead from a svg definition element
-    #
-    # @param def  The svg definition element.
-    constructor: (def) ->
-        @def = def
+    constructor: (@def, options) ->
         @elm = @def.use()
+
+        @tString = options.transform || ""
+        @elm.attr({transform: @tString})
+
+        @color = options.color || ""
+        @elm.attr({fill: @color})
+        
 
     getDefinition: () ->
         @def
