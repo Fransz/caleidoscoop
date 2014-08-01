@@ -88,10 +88,9 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     dragBead: (evt) ->
         coord = @_coordHelper(evt)
 
-        matrix = @grp.transform().localMatrix
-        matrix.e = coord.x
-        matrix.f = coord.y
-        @grp.transform(matrix.toTransformString())
+        @positionX = coord.x
+        @positionY = coord.y
+        @grp.transform("t #{@positionX}, #{@positionY}")
 
 
     # releases the bead
