@@ -35,7 +35,7 @@ class caleidoscoop.Editor
         @editorGroup.add(@beadGroup)
 
         this._initTemplateBeads(beadDefinitions, @templateBeads)
-        # this.displayTemplateBeads(@templateGroup)
+
 
 
     # init the template beads while constructing the object.
@@ -51,20 +51,6 @@ class caleidoscoop.Editor
                 _b.addTo(@templateGroup)
                 deltaY += _b.getBBox().height + 20
         
-
-
-    # displays the template area and the template beads.
-    #
-    # @return void.
-    displayTemplateBeads: (templateGroup) ->
-        for tBead in @templateBeads
-            do (tBead) ->
-                offsetY += tBead.display(offsetX, offsetY, templateGroup)
-
-        bbox = this.getBBox()
-        beadX = offsetX + bbox.x / 2
-        group.add(this.setTransform("t #{beadX}, #{offsetY}"))
-        bbox.height + 20
 
 
     # addBead adds an use element to the allBeads area, and displays it.

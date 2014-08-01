@@ -24,8 +24,11 @@ caleidoscoop.theCaleidoscoopBeadFactory = new caleidoscoop.CaleidoscoopBeadFacto
 
 
 class caleidoscoop.TemplateBeadFactory
-    copyBead: (b, editor) ->
-        options = {color: "red", transform: "", editor: editor}
+    copyBead: (b, positionX, positionY, editor) ->
+        options = {
+            color: "red", transform: "", editor: editor
+            positionX: positionX, positionY: positionY, 
+        }
         _b = new TemplateBead(b.getDefinition(), options)
         
         # TODO: this should go to setClick/EventHandler.
