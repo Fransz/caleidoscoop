@@ -19,6 +19,10 @@ class caleidoscoop.CaleidoscoopBeadFactory
         }
         new CaleidoscoopBead(b.getDefinition(), options)
 
+
+    copyBeadFromEditorBead: (bead) ->
+        @copyBead(bead, bead.tString, bead.color, bead.positionX, bead.positionY)
+
 caleidoscoop.theCaleidoscoopBeadFactory = new caleidoscoop.CaleidoscoopBeadFactory()
 
 

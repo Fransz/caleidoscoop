@@ -104,8 +104,11 @@ class caleidoscoop.Editor
 
             for bead in @allBeads
                 do (bead) ->
-                    theCaleidoscoop.addBead(new CaleidoscoopBead(bead, bead.getTransform(), bead.getColor()))
-                    bead.elm.remove()
+                    # theCaleidoscoop.addBead(new CaleidoscoopBead(bead, bead.getTransform(), bead.getColor()))
+                    theCaleidoscoop.addBead(
+                        theCaleidoscoopBeadFactory.copyBeadFromEditorBead(bead)
+                    )
+                    bead.remove()
                     bead.disableColorBead(null)
 
             theCaleidoscoop.makeTransformedGroups()

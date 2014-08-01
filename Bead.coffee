@@ -52,6 +52,9 @@ class caleidoscoop.Bead
     getHexColor: () ->
         Snap.color(@color).hex
 
+    remove: () ->
+        @grp.remove()
+
     rotate: (deg) ->
         m = @getTransformMatrix().add(Snap.matrix().rotate(deg, 0, 0))
         @tString = m.toTransformString()
