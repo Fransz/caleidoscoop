@@ -6,9 +6,9 @@ class caleidoscoop.Bead
         @grp = drawing.group()
         @grp.add(@elm)
 
-        @posX = options.positionX || 0
-        @posY = options.positionY || 0
-        @grp.transform("t #{@posX}, #{@posY}")
+        @positionX = options.positionX || 0
+        @positionY = options.positionY || 0
+        @grp.transform("t #{@positionX}, #{@positionY}")
 
         @tString = options.transform || ""
         @elm.attr({transform: @tString})

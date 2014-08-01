@@ -41,8 +41,11 @@ caleidoscoop.theTemplateBeadFactory = new caleidoscoop.TemplateBeadFactory()
 
 
 class caleidoscoop.EditorBeadFactory
-    _copyBead: (b, editor) ->
-        options = {color: b.getColor(), transform: b.getTransform(), editor: editor}
+    _copyBead: (b, positionX, positionY, editor) ->
+        options = {
+            color: b.getColor(), transform: b.getTransform(), editor: editor
+            positionX: positionX, positionY: positionY
+        }
         _b = new EditableBead(b.getDefinition(), options)
 
 
@@ -56,7 +59,8 @@ class caleidoscoop.EditorBeadFactory
         return _b
 
     copyBeadFromTemplateBead: (b, editor) ->
-        _b = @_copyBead(b, editor)
+        templateGroupPosition = editor.templateGroupPosition
+        _b = @_copyBead(b, templateGroupPosition.x + b.positionX, templateGroupPosition.y + b.positionY, editor)
         _b.elm.mousemove(_b.dragHandler)
         _b.elm.click(_b.releaseHandler)
         _b.elm.dblclick(_b.editHandler)
@@ -64,7 +68,7 @@ class caleidoscoop.EditorBeadFactory
         return _b
 
     copyBeadFromCaleidoscoopBead: (b, editor) ->
-        _b = @_copyBead(b, editor)
+        _b = @_copyBead(b, b.positionX, b.positionY, editor)
         _b.elm.click(_b.pickupHandler)
         _b.elm.dblclick(_b.editHandler)
 

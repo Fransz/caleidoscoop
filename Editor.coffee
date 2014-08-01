@@ -2,6 +2,7 @@ caleidoscoop = caleidoscoop || {}
 
 class caleidoscoop.Editor
     center: {x: 300, y: 300}
+    templateGroupPosition: {x: 450, y: -260}
 
     editorGroup: null                                      # A group for all editor components
 
@@ -22,9 +23,7 @@ class caleidoscoop.Editor
         this._initClearButton()
         this._initBorders()
 
-        templateGroupOffsetX = 450
-        templateGroupOffsetY = -260
-        templateGroupTransform = "t #{@center.x + templateGroupOffsetX}, #{@center.y + templateGroupOffsetY}"
+        templateGroupTransform = "t #{@center.x + @templateGroupPosition.x}, #{@center.y + @templateGroupPosition.y}"
         @templateGroup = drawing.group().attr({id: "templates"})
         @templateGroup.transform(templateGroupTransform)
         @editorGroup.add(@templateGroup)
@@ -58,7 +57,7 @@ class caleidoscoop.Editor
     # @param bead the bead to add.
     # @return void
     addBead: (bead) ->
-        @beadGroup.add(bead.getElement())
+        bead.addTo(@beadGroup)
         @allBeads.push(bead)
 
 
