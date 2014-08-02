@@ -13,6 +13,7 @@ class caleidoscoop.TemplateBead extends caleidoscoop.Bead
 
     clickHandler: (evt) =>
         eBead = theEditableBeadFactory.copyBeadFromTemplateBead(this, @editor)
+        @editor.addBead(eBead)
         eBead.setColor("green")
         return eBead
 

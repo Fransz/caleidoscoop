@@ -154,7 +154,6 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     disableEditBead: () ->
         @editArea.remove()
 
-        # set event handlers for the bead.
         @elm.click(@pickupHandler)
 
         for b in @editor.allBeads
@@ -238,8 +237,8 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     #
     # @return void
     deleteBead: () ->
-        @elm.remove()
-
+        @disableEditBead()
+        @editor.removeBead(this)
 
     # Event handler for the rotate icon
     #

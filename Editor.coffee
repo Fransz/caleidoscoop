@@ -61,6 +61,13 @@ class caleidoscoop.Editor
         @allBeads.push(bead)
 
 
+    removeBead: (bead) ->
+        bead.remove()
+        console.log _.indexOf(@allBeads, bead)
+        console.log @allBeads
+        @allBeads.splice(_.indexOf(@allBeads, bead), 1)
+        console.log @allBeads
+
 
     # Shows the editor
     #
@@ -100,21 +107,18 @@ class caleidoscoop.Editor
         @editorGroup.add(playButton)
 
         playButton.click((evt) =>
-            this.hide()
-
             for bead in @allBeads
                 do (bead) ->
-                    # theCaleidoscoop.addBead(new CaleidoscoopBead(bead, bead.getTransform(), bead.getColor()))
                     theCaleidoscoop.addBead(
                         theCaleidoscoopBeadFactory.copyBeadFromEditorBead(bead)
                     )
                     bead.remove()
-                    bead.disableColorBead(null)
 
             theCaleidoscoop.makeTransformedGroups()
             theCaleidoscoop.drawChambers()
 
             @allBeads = []
+            this.hide()
         )
 
 

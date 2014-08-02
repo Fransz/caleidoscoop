@@ -58,8 +58,6 @@ class caleidoscoop.EditorBeadFactory
         _b.setReleaseHandler(_b.releaseBead)
         _b.setEditHandler(_b.editBead)
 
-        editor.addBead(_b)
-
         return _b
 
     copyBeadFromTemplateBead: (b, editor) ->

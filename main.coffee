@@ -93,7 +93,8 @@ editHandler = (evt) ->
 
     for bead in theCaleidoscoop.allBeads
         do (bead) ->
-            theEditableBeadFactory.copyBeadFromCaleidoscoopBead(bead, theEditor)
+            theEditor.addBead(theEditableBeadFactory.copyBeadFromCaleidoscoopBead(bead, theEditor))
+
 
     theCaleidoscoop.clear()
     theEditor.show()
