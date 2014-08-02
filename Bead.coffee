@@ -19,15 +19,27 @@ class caleidoscoop.Bead
         @elm.attr({fill: @color})
         
 
+    setPositionX: (positionX) ->
+        @positionX = positionX
+        @grp.transform("t #{@positionX}, #{@positionY}")
+
+    setPositionY: (positionY) ->
+        @positionY = positionY
+        @grp.transform("t #{@positionX}, #{@positionY}")
+
+    setTransform: (tMatrix) ->
+        @tMatrix = tMatrix
+        @elm.transform(@tMatrix)
+
+    setColor: (color) ->
+        @color = color
+        @elm.attr({fill: color})
+
     getBBox: () ->
         @def.getBBox()
 
     addTo: (grp) ->
         grp.add(@grp)
-
-    setColor: (color) ->
-        @color = color
-        @elm.attr({fill: color})
 
     getHexColor: () ->
         Snap.color(@color).hex
