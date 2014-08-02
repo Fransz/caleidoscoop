@@ -10,13 +10,13 @@ class caleidoscoop.Bead
         @positionY = options.positionY || 0
         @grp.transform("t #{@positionX}, #{@positionY}")
 
-        # @tString = options.transform || ""
-        # @elm.attr({transform: @tString})
         @tMatrix = options.transform || Snap.matrix()
         @elm.transform(@tMatrix)
 
         @color = options.color || ""
         @elm.attr({fill: @color})
+
+        @boundEvents = []
         
 
     setPositionX: (positionX) ->
@@ -35,17 +35,20 @@ class caleidoscoop.Bead
         @color = color
         @elm.attr({fill: color})
 
+
     getBBox: () ->
         @def.getBBox()
-
-    addTo: (grp) ->
-        grp.add(@grp)
 
     getHexColor: () ->
         Snap.color(@color).hex
 
+
+    addTo: (grp) ->
+        grp.add(@grp)
+
     remove: () ->
         @grp.remove()
+
 
     rotate: (deg) ->
         @tMatrix.add(Snap.matrix().rotate(deg, 0, 0))
@@ -54,3 +57,17 @@ class caleidoscoop.Bead
     flipHorizontal: () ->
         @tMatrix = Snap.matrix().scale(-1, 1).add(@tMatrix)
         @elm.transform(@tMatrix)
+
+    bindHandler: (evtName, fn, args) ->
+        args = args || Array()
+
+        handler = (evt) =>
+            args.unshift(evt)
+            fn.apply(this, args)
+
+        Snap[evtName].call(@elm, handler)
+        @boundEvents[evtName] = handler
+
+    unBindHandler: (evtName) ->
+        Snap["un" + evtName].call(@elm, handler)
+        @boundEvents[evtName] = null

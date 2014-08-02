@@ -34,9 +34,6 @@ class caleidoscoop.TemplateBeadFactory
             positionX: positionX, positionY: positionY, 
         }
         _b = new TemplateBead(b.def, options)
-        
-        # TODO: this should go to setClick/EventHandler.
-        _b.elm.click(_b.clickHandler)
 
         return _b
 

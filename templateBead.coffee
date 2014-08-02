@@ -8,10 +8,10 @@ class caleidoscoop.TemplateBead extends caleidoscoop.Bead
     constructor: (defElement, options) ->
         @editor = options.editor || null
         super(defElement, options)
+        this.bindHandler('click', @copyBead)
 
 
-
-    clickHandler: (evt) =>
+    copyBead: (evt) =>
         eBead = theEditableBeadFactory.copyBeadFromTemplateBead(this, @editor)
         @editor.addBead(eBead)
         eBead.setColor("green")
