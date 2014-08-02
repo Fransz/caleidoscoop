@@ -19,17 +19,8 @@ class caleidoscoop.Bead
         @elm.attr({fill: @color})
         
 
-    getDefinition: () ->
-        @def
-
-    getElement: () ->
-        @elm
-
     getBBox: () ->
         @def.getBBox()
-
-    getGrp: () ->
-        @grp
 
     addTo: (grp) ->
         grp.add(@grp)
@@ -37,9 +28,6 @@ class caleidoscoop.Bead
     setColor: (color) ->
         @color = color
         @elm.attr({fill: color})
-
-    getColor: () ->
-        @color
 
     getHexColor: () ->
         Snap.color(@color).hex
@@ -51,8 +39,6 @@ class caleidoscoop.Bead
         @tMatrix.add(Snap.matrix().rotate(deg, 0, 0))
         @elm.transform(@tMatrix)
 
-    # @TODO: the scale has to be after the rotate transformations of the bead.
     flipHorizontal: () ->
         @tMatrix = Snap.matrix().scale(-1, 1).add(@tMatrix)
-        # @tMatrix = @tMatrix.add(Snap.matrix().scale(-1, 1))
         @elm.transform(@tMatrix)

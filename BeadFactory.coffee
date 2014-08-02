@@ -2,7 +2,7 @@ caleidoscoop = caleidoscoop || {}
 
 class caleidoscoop.BeadFactory
     copyBead: (b) ->
-        new Bead(b.getDefinition(), {})
+        new Bead(b.def, {})
 
     createBead: (d) ->
         new Bead(d, {})
@@ -17,7 +17,7 @@ class caleidoscoop.CaleidoscoopBeadFactory
             transform: transform, color: color,
             positionX: positionX, positionY: positionY
         }
-        new CaleidoscoopBead(b.getDefinition(), options)
+        new CaleidoscoopBead(b.def, options)
 
 
     copyBeadFromEditorBead: (bead) ->
@@ -33,7 +33,7 @@ class caleidoscoop.TemplateBeadFactory
             color: "red", transform: "", editor: editor
             positionX: positionX, positionY: positionY, 
         }
-        _b = new TemplateBead(b.getDefinition(), options)
+        _b = new TemplateBead(b.def, options)
         
         # TODO: this should go to setClick/EventHandler.
         _b.elm.click(_b.clickHandler)
@@ -47,10 +47,10 @@ caleidoscoop.theTemplateBeadFactory = new caleidoscoop.TemplateBeadFactory()
 class caleidoscoop.EditorBeadFactory
     _copyBead: (b, positionX, positionY, editor) ->
         options = {
-            color: b.getColor(), transform: b.tMatrix, editor: editor
+            color: b.color, transform: b.tMatrix, editor: editor
             positionX: positionX, positionY: positionY
         }
-        _b = new EditableBead(b.getDefinition(), options)
+        _b = new EditableBead(b.def, options)
 
 
         _b.setPickupHandler(_b.pickupBead)
