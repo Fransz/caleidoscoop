@@ -178,11 +178,8 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         bbox = c.getBBox()
         c.remove()
 
-        beadTransform = @getTransformMatrix()
-        beadTransform.a = beadTransform.d = 1
-        beadTransform.b = beadTransform.c = 0
-
-        @editArea = drawing.group().transform(beadTransform)
+        # @todo: We have no more translations on the beads element.
+        @editArea = drawing.group()
         @grp.add(@editArea)
 
         editBox = drawing.rect(bbox.x, bbox.y, bbox.width, bbox.height).attr(stroke: "orange", "stroke-width": "1px", fill: "none")

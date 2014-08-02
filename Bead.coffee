@@ -10,8 +10,10 @@ class caleidoscoop.Bead
         @positionY = options.positionY || 0
         @grp.transform("t #{@positionX}, #{@positionY}")
 
-        @tString = options.transform || ""
-        @elm.attr({transform: @tString})
+        # @tString = options.transform || ""
+        # @elm.attr({transform: @tString})
+        @tMatrix = options.transform || Snap.matrix()
+        @elm.transform(@tMatrix)
 
         @color = options.color || ""
         @elm.attr({fill: @color})
@@ -32,16 +34,6 @@ class caleidoscoop.Bead
     addTo: (grp) ->
         grp.add(@grp)
 
-    setTransform: (tString) ->
-        @tString = tString
-        @elm.transform(tString)
-
-    getTransform: () ->
-        @tString
-
-    getTransformMatrix: () ->
-        @elm.transform().localMatrix
-
     setColor: (color) ->
         @color = color
         @elm.attr({fill: color})
@@ -56,13 +48,11 @@ class caleidoscoop.Bead
         @grp.remove()
 
     rotate: (deg) ->
-        m = @getTransformMatrix().add(Snap.matrix().rotate(deg, 0, 0))
-        @tString = m.toTransformString()
-        @elm.transform(@tString)
+        @tMatrix.add(Snap.matrix().rotate(deg, 0, 0))
+        @elm.transform(@tMatrix)
 
     # @TODO: the scale has to be after the rotate transformations of the bead.
     flipHorizontal: () ->
-        m = @getTransformMatrix()
-        m.add(Snap.matrix().scale(-1, 1))
-        @tString = m.toTransformString()
-        @elm.transform(@tString)
+        @tMatrix = Snap.matrix().scale(-1, 1).add(@tMatrix)
+        # @tMatrix = @tMatrix.add(Snap.matrix().scale(-1, 1))
+        @elm.transform(@tMatrix)

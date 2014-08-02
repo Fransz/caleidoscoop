@@ -21,7 +21,7 @@ class caleidoscoop.CaleidoscoopBeadFactory
 
 
     copyBeadFromEditorBead: (bead) ->
-        @copyBead(bead, bead.tString, bead.color, bead.positionX, bead.positionY)
+        @copyBead(bead, bead.tMatrix, bead.color, bead.positionX, bead.positionY)
 
 caleidoscoop.theCaleidoscoopBeadFactory = new caleidoscoop.CaleidoscoopBeadFactory()
 
@@ -47,7 +47,7 @@ caleidoscoop.theTemplateBeadFactory = new caleidoscoop.TemplateBeadFactory()
 class caleidoscoop.EditorBeadFactory
     _copyBead: (b, positionX, positionY, editor) ->
         options = {
-            color: b.getColor(), transform: b.getTransform(), editor: editor
+            color: b.getColor(), transform: b.tMatrix, editor: editor
             positionX: positionX, positionY: positionY
         }
         _b = new EditableBead(b.getDefinition(), options)

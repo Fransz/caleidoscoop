@@ -76,13 +76,13 @@ class caleidoscoop.Caleidoscoop
         _positionX = (x) -> x - bead.getBBox().x / 2
         _positionY = (y) -> y - bead.getBBox().y / 2
 
-        rotation = "r" + Math.round(360 * Math.random()) + ",0,0"
+        rotation = Snap.matrix().rotate(Math.round(360 * Math.random()) , 0, 0)
         hsb = "hsb(".concat(Math.random(), ",.75", ", .75)")
 
         centers = []
         centers.push { x: Math.round(x * Math.random() * @center.x), y: Math.round(y * Math.random() * @center.y) } for y in [-1, 1] for x in [-1, 1]
 
-        theCaleidoscoopBeadFactory.copyBead(bead, rotation, hsb, _positionX(c.x), _positionY(c.y)) for c in centers
+        theCaleidoscoopBeadFactory.copyBead(bead, rotation.clone(), hsb, _positionX(c.x), _positionY(c.y)) for c in centers
 
 
 

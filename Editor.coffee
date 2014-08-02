@@ -46,6 +46,7 @@ class caleidoscoop.Editor
         for b in beadDefinitions
             do (b) =>
                 _b = theTemplateBeadFactory.copyBead(b, 0, deltaY, this)
+                # @todo: this should go to editor.
                 templateBeads.push(_b)
                 _b.addTo(@templateGroup)
                 deltaY += _b.getBBox().height + 20
@@ -63,10 +64,7 @@ class caleidoscoop.Editor
 
     removeBead: (bead) ->
         bead.remove()
-        console.log _.indexOf(@allBeads, bead)
-        console.log @allBeads
         @allBeads.splice(_.indexOf(@allBeads, bead), 1)
-        console.log @allBeads
 
 
     # Shows the editor
