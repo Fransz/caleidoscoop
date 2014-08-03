@@ -25,28 +25,8 @@ class caleidoscoop.BeadsColorPicker
 
 
     disable: () ->
-        # cp = document.getElementById('colorpicker')
-        # slider = document.getElementById('slider')
-        # picker = document.getElementById('picker')
-        # ok = document.getElementById('ok')
-        # cancel = document.getElementById('cancel')
-
-        # for n in @slider.childNodes
-            # do (n) =>
-                # n && @slider.removeChild(n)
-        # for n in @picker.childNodes
-            # do (n) =>
-                # n && picker.removeChild(n)
-
-        # # @Todo how to correct remove the event,
-        # ok.removeEventListener('click', @_colorPickerOkHandler, false)
-        # cancel.removeEventListener('click', @_colorPickerCancelHandler, false)
-        # ok.onclick = null
-        # cancel.onclick = null
-        # @_addHtmlEventListener(ok, 'click', (evt) -> )
-        # @_addHtmlEventListener(cancel, 'click', (evt) -> )
-
         @elm.style.display = 'none'
+        @bead.disableColorBead(@colorIcon)
 
 
     _addHtmlEventListener: (element, event, listener) ->
@@ -59,8 +39,6 @@ class caleidoscoop.BeadsColorPicker
     _colorPickerOkHandler: (evt) =>
         @bead.setColor(@newColor)
         @disable()
-        @colorIcon.click(@bead.colorHandler)
          
     _colorPickerCancelHandler: (evt) =>
         @disable()
-        @colorIcon.click(@bead.colorHandler)

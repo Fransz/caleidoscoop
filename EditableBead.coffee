@@ -254,5 +254,10 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     # @return void
     colorBead: (evt, colorIcon) ->
         @editor.colorPicker.enable(this, colorIcon)
+        @unBindHandler('click', colorIcon)
 
-        colorIcon.unclick(@colorHandler)
+
+    disableColorBead: (colorIcon) ->
+        @bindHandler('click', @colorBead, [colorIcon], colorIcon)
+
+
