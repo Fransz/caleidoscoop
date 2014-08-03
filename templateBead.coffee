@@ -12,11 +12,6 @@ class caleidoscoop.TemplateBead extends caleidoscoop.Bead
 
 
     copyBead: (evt) =>
-        eBead = theEditableBeadFactory.copyBeadFromTemplateBead(this, @editor)
-        @editor.addBead(eBead)
-        eBead.setColor("green")
-        return eBead
-
-
-
-
+        b = theEditableBeadFactory.copyBeadFromTemplateBead(this, @editor)
+        @editor.addBead(b)
+        b.setColor("green")

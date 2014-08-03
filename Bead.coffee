@@ -16,7 +16,7 @@ class caleidoscoop.Bead
         @color = options.color || ""
         @elm.attr({fill: @color})
 
-        @boundEvents = []
+        @boundEvents = {}
         
 
     setPositionX: (positionX) ->
@@ -58,16 +58,14 @@ class caleidoscoop.Bead
         @tMatrix = Snap.matrix().scale(-1, 1).add(@tMatrix)
         @elm.transform(@tMatrix)
 
-    bindHandler: (evtName, fn, args) ->
-        args = args || Array()
-
+    bindHandler: (evtName, fn, args = [], elm = @elm) ->
         handler = (evt) =>
             args.unshift(evt)
             fn.apply(this, args)
 
-        Snap[evtName].call(@elm, handler)
+        Snap[evtName].call(elm, handler)
         @boundEvents[evtName] = handler
 
-    unBindHandler: (evtName) ->
-        Snap["un" + evtName].call(@elm, handler)
+    unBindHandler: (evtName, elm = @elm) ->
+        Snap["un" + evtName].call(elm, @boundEvents[evtName])
         @boundEvents[evtName] = null
