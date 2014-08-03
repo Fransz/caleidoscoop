@@ -19,6 +19,7 @@ class caleidoscoop.Editor
     # @param beadGroup An array with all beads drawn in the caleidoscoop.
     constructor: (beadDefinitions) ->
         @editorGroup = drawing.group().attr({id: "editor", display: "none"})
+
         this._initPlayButton()
         this._initClearButton()
         this._initBorders()
@@ -30,8 +31,9 @@ class caleidoscoop.Editor
 
         @beadGroup = drawing.group().attr({id: "beads"})
         @beadGroup.transform("t #{@center.x}, #{@center.y}")
-
         @editorGroup.add(@beadGroup)
+
+        @colorPicker = new BeadsColorPicker
 
         this._initTemplateBeads(beadDefinitions, @templateBeads)
 
@@ -79,6 +81,7 @@ class caleidoscoop.Editor
     # @return void
     hide: () ->
         @editorGroup.attr({display: "none"})
+        @colorPicker.disable()
 
     # init the editors play button
     #

@@ -1,5 +1,6 @@
 _.extend(window, caleidoscoop)
 
+
 drawing = Snap("#drawing")
 
 

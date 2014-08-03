@@ -6,12 +6,6 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
 
         @editor = options.editor || null
 
-        @c = new ColorPicker(slider, picker,
-                (hex, hsv, rgb) ->
-                    preview.style.backgroundColor = hex
-                    this.newColor = hex
-            )
-
 
     # Eventhandler for clicking on the new bead again.
     #
@@ -173,8 +167,6 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @unBindHandler('dblclick')
         @bindHandler('dblclick', @editBead)
 
-        @disableColorBead(null)
-
 
     # _shows the edit bead icons for a given bead.
     #
@@ -261,65 +253,6 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     #
     # @return void
     colorBead: (evt, colorIcon) ->
-        cp = document.getElementById('colorpicker')
-        slider = document.getElementById('slider')
-        picker = document.getElementById('picker')
-        preview = document.getElementById('preview')
-        ok = document.getElementById('ok')
-        cancel = document.getElementById('cancel')
-
-        cp.style.display = 'block'
-
-        @_addHtmlEventListener(ok, 'click', @_colorPickerOkHandler)
-        @_addHtmlEventListener(cancel, 'click', @_colorPickerCancelHandler)
-
-        @c.originalColor = @getHexColor()
-        @c.setHex(@getHexColor())
+        @editor.colorPicker.enable(this, colorIcon)
 
         colorIcon.unclick(@colorHandler)
-
-    _colorPickerOkHandler: (evt) =>
-        @setColor(@c.newColor)
-        @disableColorBead()
-        colorIcon.click(@colorHandler)
-         
-    _colorPickerCancelHandler: (evt) =>
-        @setColor(@c.originalColor)
-        @disableColorBead()
-        colorIcon.click(@colorHandler)
-
-    _addHtmlEventListener: (element, event, listener) ->
-        if (element.attachEvent)
-            element.attachEvent('on' + event, listener)
-        else if (element.addEventListener)
-            element.addEventListener(event, listener, false)
-
-
-    # Event handler for the disabling the colorpicker
-    #
-    # @return void
-    disableColorBead: (evt) ->
-        cp = document.getElementById('colorpicker')
-        slider = document.getElementById('slider')
-        picker = document.getElementById('picker')
-        ok = document.getElementById('ok')
-        cancel = document.getElementById('cancel')
-
-        for n in slider.childNodes
-            do (n) =>
-                n && slider.removeChild(n)
-        for n in picker.childNodes
-            do (n) =>
-                n && picker.removeChild(n)
-
-        # @Todo how to correct remove the event,
-        ok.removeEventListener('click', @_colorPickerOkHandler, false)
-        cancel.removeEventListener('click', @_colorPickerCancelHandler, false)
-        ok.onclick = null
-        cancel.onclick = null
-        @_addHtmlEventListener(ok, 'click', (evt) -> )
-        @_addHtmlEventListener(cancel, 'click', (evt) -> )
-
-        cp.style.display = 'none'
-
-
