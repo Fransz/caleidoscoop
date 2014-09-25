@@ -1,37 +1,67 @@
 _.extend(window, caleidoscoop)
 
+
 drawing = Snap("#drawing")
 
-#
-# Form definitions.
+
+formGroup = drawing.group().attr({id: "formGroup"}).toDefs()
+theBeadGroup = drawing.group().attr(id: "theBeadGroup").toDefs()
+
 circleForm = drawing.circle(0, 0, 30).attr({id: "circleForm"})
-circle = new Bead(circleForm.toDefs())
+formGroup.add(circleForm)
+
+circle = theBeadFactory.createBead(circleForm)
+circle.addTo(theBeadGroup)
+
 
 triangleForm = drawing.polyline([[0, -30], [30, 30], [-30, 30]]).attr({id: "triangleForm"})
-triangle = new Bead(triangleForm.toDefs())
+formGroup.add(triangleForm)
+
+triangle = theBeadFactory.createBead(triangleForm)
+triangle.addTo(theBeadGroup)
+
 
 squareForm = drawing.rect(-30, -30, 60, 60).attr({id: "squareForm"})
-square = new Bead(squareForm.toDefs())
+formGroup.add(squareForm)
+
+square = theBeadFactory.createBead(squareForm)
+square.addTo(theBeadGroup)
+
 
 diamondForm = drawing.polyline([[-30,0], [-20, -20], [20, -20], [30, 0], [0, 40]]).attr({id: "diamondForm"})
-diamond = new Bead(diamondForm.toDefs())
+formGroup.add(diamondForm)
+
+diamond = theBeadFactory.createBead(diamondForm)
+diamond.addTo(theBeadGroup)
+
 
 starForm = drawing.group().attr({id: "starForm"})
 starForm.add(drawing.polyline([[0, -30], [30, 16], [-30, 16]]))
 starForm.add(drawing.polyline([[0, 30], [30, -16], [-30, -16]]))
-star = new Bead(starForm.toDefs())
+formGroup.add(starForm)
+
+star = theBeadFactory.createBead(starForm)
+star.addTo(theBeadGroup)
+
 
 wingForm = drawing.group().attr({id: "wingForm"})
-wingForm.toDefs()
 wingForm.add(drawing.ellipse(0, 0, 16, 30))
 wingForm.add(drawing.ellipse(0, 0, 30, 16))
-wing = new Bead(wingForm.toDefs())
+formGroup.add(wingForm)
+
+wing = theBeadFactory.createBead(wingForm)
+wing.addTo(theBeadGroup)
+
 
 ellForm = drawing.group().attr({id: "ell"})
 ellForm.add(drawing.rect(-20, -20, 10, 40))
 ellForm.add(drawing.rect(-20, 20, 40, 10))
 ellForm.add(drawing.circle(0, 0, 5))
-ell = new Bead(ellForm.toDefs())
+formGroup.add(ellForm)
+
+ell = theBeadFactory.createBead(ellForm)
+ell.addTo(theBeadGroup)
+
 
 theBeads = [circle, triangle, square, diamond, star, wing]
 
@@ -64,7 +94,8 @@ editHandler = (evt) ->
 
     for bead in theCaleidoscoop.allBeads
         do (bead) ->
-            new EditableBead(bead, theEditor)
+            theEditor.addBead(theEditableBeadFactory.copyBeadFromCaleidoscoopBead(bead, theEditor))
+
 
     theCaleidoscoop.clear()
     theEditor.show()

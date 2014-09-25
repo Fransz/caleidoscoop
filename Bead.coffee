@@ -1,55 +1,71 @@
 caleidoscoop = caleidoscoop || {}
 
 class caleidoscoop.Bead
-    def: null                       # The beads defining element.
-    elm: null                       # The beads use element.
-    tString: ""                     # The beads transformation string
-    color: 0                         # The beads color, a hsb value.
-
-    # Construct a Bead from a svg definition element
-    #
-    # @param def  The svg definition element.
-    constructor: (def) ->
-        @def = def
+    constructor: (@def, options) ->
         @elm = @def.use()
+        @grp = drawing.group()
+        @grp.add(@elm)
 
-    getDefinition: () ->
-        @def
+        @positionX = options.positionX || 0
+        @positionY = options.positionY || 0
+        @grp.transform("t #{@positionX}, #{@positionY}")
 
-    getElement: () ->
-        @elm
+        @tMatrix = options.transform || Snap.matrix()
+        @elm.transform(@tMatrix)
 
-    getBBox: () ->
-        @def.getBBox()
+        @color = options.color || ""
+        @elm.attr({fill: @color})
 
-    setTransform: (tString) ->
-        @tString = tString
-        @elm.transform(tString)
+        @boundEvents = {}
+        
 
-    getTransform: () ->
-        @tString
+    setPositionX: (positionX) ->
+        @positionX = positionX
+        @grp.transform("t #{@positionX}, #{@positionY}")
 
-    getTransformMatrix: () ->
-        @elm.transform().localMatrix
+    setPositionY: (positionY) ->
+        @positionY = positionY
+        @grp.transform("t #{@positionX}, #{@positionY}")
+
+    setTransform: (tMatrix) ->
+        @tMatrix = tMatrix
+        @elm.transform(@tMatrix)
 
     setColor: (color) ->
         @color = color
         @elm.attr({fill: color})
 
-    getColor: () ->
-        @color
+
+    getBBox: () ->
+        @def.getBBox()
 
     getHexColor: () ->
         Snap.color(@color).hex
 
-    rotate: (deg) ->
-        m = @getTransformMatrix().add(Snap.matrix().rotate(deg, 0, 0))
-        @tString = m.toTransformString()
-        @elm.transform(@tString)
 
-    # @TODO: the scale has to be after the rotate transformations of the bead.
+    addTo: (grp) ->
+        grp.add(@grp)
+
+    remove: () ->
+        @grp.remove()
+
+
+    rotate: (deg) ->
+        @tMatrix.add(Snap.matrix().rotate(deg, 0, 0))
+        @elm.transform(@tMatrix)
+
     flipHorizontal: () ->
-        m = @getTransformMatrix()
-        m.add(Snap.matrix().scale(-1, 1))
-        @tString = m.toTransformString()
-        @elm.transform(@tString)
+        @tMatrix = Snap.matrix().scale(-1, 1).add(@tMatrix)
+        @elm.transform(@tMatrix)
+
+    bindHandler: (evtName, fn, args = [], elm = @elm) ->
+        handler = (evt) =>
+            args.unshift(evt)
+            fn.apply(this, args)
+
+        Snap[evtName].call(elm, handler)
+        @boundEvents[evtName] = handler
+
+    unBindHandler: (evtName, elm = @elm) ->
+        Snap["un" + evtName].call(elm, @boundEvents[evtName])
+        @boundEvents[evtName] = null

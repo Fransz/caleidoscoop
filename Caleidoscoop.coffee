@@ -17,16 +17,15 @@ class caleidoscoop.Caleidoscoop
 
     transformedClipCones: []
 
-    constructor: (beadDefinitions, angles, clipCone) ->
-        @clipCone = clipCone
-
+    constructor: (defBeads, angles, @clipCone) ->
         @masterGroup = drawing.group().attr({id: "beadsMaster"}).toDefs()
         @transformations = this.makeTransformations(angles)
 
-        this.createBeads(beadDefinition, @allBeads) for beadDefinition in beadDefinitions
-        this.addBeadToMasterGroup(bead) for bead in @allBeads
-        this.makeTransformedGroups()
-        this.drawChambers()
+        randomBeads = _.flatten(@generateBeads(defBead) for defBead in defBeads)
+        @addBead(randomBead) for randomBead in randomBeads
+
+        @makeTransformedGroups()
+        @drawChambers()
 
 
     # Make all transformation matrices from the mirrors made by the given angels.
@@ -68,29 +67,22 @@ class caleidoscoop.Caleidoscoop
         @transformedGroups = (@masterGroup.use().transform(t) for t in @transformations)
 
 
-    # Create four new beads with a position, a rotation and a hue from a bead definition.
+    # Generate four new beads with a position, a rotation and a hue from a bead definition.
     # The beads are added to the allBeads array.
     #
     # @param beadDef  The definition of the bead.
     # @return void
-    createBeads: (bead, allBeads) ->
-        rotation = "r" + Math.round(360 * Math.random()) + ",0,0"
+    generateBeads: (bead) ->
+        _positionX = (x) -> x - bead.getBBox().x / 2
+        _positionY = (y) -> y - bead.getBBox().y / 2
+
+        rotation = Snap.matrix().rotate(Math.round(360 * Math.random()) , 0, 0)
+        hsb = "hsb(".concat(Math.random(), ",.75", ", .75)")
 
         centers = []
         centers.push { x: Math.round(x * Math.random() * @center.x), y: Math.round(y * Math.random() * @center.y) } for y in [-1, 1] for x in [-1, 1]
 
-        bbox = bead.getBBox()
-        translatex = (x) -> x - bbox.x / 2
-        translatey = (y) -> y - bbox.y / 2
-        transforms = ("t#{translatex(c.x)},#{translatey(c.y)}" + rotation for c in centers)
-
-        hsb = "hsb(".concat(Math.random(), ",.75", ", .75)")
-
-        for t in transforms
-            do (t) ->
-                cBead = new CaleidoscoopBead(bead, t, hsb)
-                allBeads.push(cBead)
-
+        theCaleidoscoopBeadFactory.copyBead(bead, rotation.clone(), hsb, _positionX(c.x), _positionY(c.y)) for c in centers
 
 
 
@@ -98,18 +90,9 @@ class caleidoscoop.Caleidoscoop
     #
     # @param bead  The bead.
     # @return void
-    addBead: (cBead) ->
-        @allBeads.push(cBead)
-        @masterGroup.add(cBead.getElement())
-
-
-
-    # Adds a single bead to the untransformed group of all beads.
-    #
-    # @param bead  The bead.
-    # @return void.
-    addBeadToMasterGroup: (cBead) ->
-        @masterGroup.add(cBead.getElement())
+    addBead: (bead) ->
+        @allBeads.push(bead)
+        bead.addTo(@masterGroup)
 
 
 

@@ -2,6 +2,7 @@ caleidoscoop = caleidoscoop || {}
 
 class caleidoscoop.Editor
     center: {x: 300, y: 300}
+    templateGroupPosition: {x: 450, y: -260}
 
     editorGroup: null                                      # A group for all editor components
 
@@ -18,20 +19,24 @@ class caleidoscoop.Editor
     # @param beadGroup An array with all beads drawn in the caleidoscoop.
     constructor: (beadDefinitions) ->
         @editorGroup = drawing.group().attr({id: "editor", display: "none"})
+
         this._initPlayButton()
         this._initClearButton()
         this._initBorders()
 
+        templateGroupTransform = "t #{@center.x + @templateGroupPosition.x}, #{@center.y + @templateGroupPosition.y}"
         @templateGroup = drawing.group().attr({id: "templates"})
-        @templateGroup.transform("t #{@center.x}, #{@center.y}")
+        @templateGroup.transform(templateGroupTransform)
         @editorGroup.add(@templateGroup)
 
         @beadGroup = drawing.group().attr({id: "beads"})
         @beadGroup.transform("t #{@center.x}, #{@center.y}")
         @editorGroup.add(@beadGroup)
 
+        @colorPicker = new BeadsColorPicker
+
         this._initTemplateBeads(beadDefinitions, @templateBeads)
-        this.displayTemplateBeads(@templateGroup)
+
 
 
     # init the template beads while constructing the object.
@@ -39,21 +44,34 @@ class caleidoscoop.Editor
     # @param beadDefinitions Definitions for the template beads.
     # @return void
     _initTemplateBeads: (beadDefinitions, templateBeads) ->
-        for bDef in beadDefinitions
-            do (bDef) =>
-                templateBeads.push(new TemplateBead(bDef, this))
+        deltaY = 0
+        for b in beadDefinitions
+            do (b) =>
+                _b = theTemplateBeadFactory.copyBead(b, 0, deltaY, this)
+                # @todo: this should go to editor.
+                templateBeads.push(_b)
+                _b.addTo(@templateGroup)
+                deltaY += _b.getBBox().height + 20
+        
 
+    enableAllBeads: () ->
+        for b in @allBeads
+            do (b) =>
+                b.bindHandler('dblclick', b.editBead)
+                b.bindHandler('click', b.pickupBead)
+        for b in @templateBeads
+            do (b) =>
+                b.bindHandler('click', b.copyBead)
 
-    # displays the template area and the template beads.
-    #
-    # @return void.
-    displayTemplateBeads: (templateGroup) ->
-        offsetX = 400
-        offsetY = -260
-
-        for tBead in @templateBeads
-            do (tBead) ->
-                offsetY += tBead.display(offsetX, offsetY, templateGroup)
+    disableAllBeads: () ->
+        for b in @allBeads
+            do (b) ->
+                b.unBindHandler('dblclick')
+                b.unBindHandler('click')
+        for b in @templateBeads
+            do (b) ->
+                b.unBindHandler('dblclick')
+                b.unBindHandler('click')
 
 
     # addBead adds an use element to the allBeads area, and displays it.
@@ -61,9 +79,13 @@ class caleidoscoop.Editor
     # @param bead the bead to add.
     # @return void
     addBead: (bead) ->
-        @beadGroup.add(bead.getElement())
+        bead.addTo(@beadGroup)
         @allBeads.push(bead)
 
+
+    removeBead: (bead) ->
+        bead.remove()
+        @allBeads.splice(_.indexOf(@allBeads, bead), 1)
 
 
     # Shows the editor
@@ -78,6 +100,7 @@ class caleidoscoop.Editor
     # @return void
     hide: () ->
         @editorGroup.attr({display: "none"})
+        @colorPicker.disable()
 
     # init the editors play button
     #
@@ -89,7 +112,7 @@ class caleidoscoop.Editor
         @editorGroup.add(clearButton)
 
         clearButton.click((evt) =>
-            bead.elm.remove() for bead in @allBeads
+            bead.remove() for bead in @allBeads
             @allBeads = []
         )
 
@@ -104,18 +127,18 @@ class caleidoscoop.Editor
         @editorGroup.add(playButton)
 
         playButton.click((evt) =>
-            this.hide()
-
             for bead in @allBeads
                 do (bead) ->
-                    theCaleidoscoop.addBead(new CaleidoscoopBead(bead, bead.getTransform(), bead.getColor()))
-                    bead.elm.remove()
-                    bead.disableColorBead(null)
+                    theCaleidoscoop.addBead(
+                        theCaleidoscoopBeadFactory.copyBeadFromEditorBead(bead)
+                    )
+                    bead.remove()
 
             theCaleidoscoop.makeTransformedGroups()
             theCaleidoscoop.drawChambers()
 
             @allBeads = []
+            this.hide()
         )
 
 
