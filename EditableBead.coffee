@@ -7,70 +7,11 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
         @editor = options.editor || null
 
 
-    # Eventhandler for clicking on the new bead again.
-    #
-    # @param evt The click event.
-    # @return void
-    # setPickupHandler: (fn) ->
-        # @pickupHandler = (evt) =>
-            # fn.apply(this)
-
-
-    # Event handler for moving the new bead.
-    #
-    # @param evt The move event
-    # setDragHandler: (fn) ->
-        # @dragHandler = (evt) =>
-            # fn.call(this, evt)
-
-    # Event handler for releasing the bead.
-    #
-    # @param evt The click event.
-    # setReleaseHandler: (fn) ->
-        # @releaseHandler = (evt) =>
-            # fn.apply(this)
-
-
-    # setEditHandler: (fn) ->
-        # @editHandler = (evt) =>
-            # fn.apply(this)
-
-
-    # setDeleteHandler: (fn) ->
-        # @deleteHandler = (evt) =>
-            # fn.apply(this)
-
-
-    # setRotateHandler: (fn) ->
-        # @rotateHandler = (evt) =>
-            # fn.apply(this)
-
-
-    # setMirrorHandler: (fn) ->
-        # @mirrorHandler = (evt) =>
-            # fn.apply(this)
-
-
-    # setColorHandler: (fn, arg) ->
-        # @colorHandler = (evt) =>
-            # fn.call(this, arg)
-
-    # setColorPickerCancelHandler: (fn) ->
-        # @colorPickerCancelHandler = (evt) =>
-            # fn.apply(this)
-
-
-    # setColorPickerOkHandler: (fn) ->
-        # @colorPickerOkHandler = (evt) =>
-            # fn.apply(this)
-
-
     # picksup the bead
     #
     # @return void
     pickupBead: (evt) ->
-        @unBindHandler('dblclick')
-        @unBindHandler('click')
+        @editor.disableAllBeads()
         @bindHandler('click', @releaseBead)
         @bindHandler('mousemove', @dragBead)
 
@@ -93,8 +34,7 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     releaseBead: (evt) ->
         @unBindHandler('click')
         @unBindHandler('mousemove')
-        @bindHandler('click', @pickupBead)
-        @bindHandler('dblclick', @editBead)
+        @editor.enableAllBeads()
 
 
     # Helper function for calculating new coordinates while dragging
@@ -129,17 +69,10 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     #
     # @return void
     editBead: () ->
+        console.log 'double clicked'
         @showBeadEdit()
 
-        for b in @editor.allBeads
-            do (b) ->
-                b.unBindHandler('dblclick')
-                b.unBindHandler('click')
-        for b in @editor.templateBeads
-            do (b) ->
-                b.unBindHandler('dblclick')
-                b.unBindHandler('click')
-
+        @editor.disableAllBeads()
         @unBindHandler('click')
         @unBindHandler('mousemove')
 
@@ -153,19 +86,7 @@ class caleidoscoop.EditableBead extends caleidoscoop.Bead
     disableEditBead: () ->
         @editArea.remove()
 
-        for b in @editor.allBeads
-            do (b) =>
-                b.bindHandler('dblclick', b.editBead)
-                b.bindHandler('click', b.pickupBead)
-        for b in @editor.templateBeads
-            do (b) =>
-                b.bindHandler('click', b.copyBead)
-
-        @unBindHandler('click')
-        @bindHandler('click', @pickupBead)
-
-        @unBindHandler('dblclick')
-        @bindHandler('dblclick', @editBead)
+        @editor.enableAllBeads()
 
 
     # _shows the edit bead icons for a given bead.

@@ -54,6 +54,25 @@ class caleidoscoop.Editor
                 deltaY += _b.getBBox().height + 20
         
 
+    enableAllBeads: () ->
+        for b in @allBeads
+            do (b) =>
+                b.bindHandler('dblclick', b.editBead)
+                b.bindHandler('click', b.pickupBead)
+        for b in @templateBeads
+            do (b) =>
+                b.bindHandler('click', b.copyBead)
+
+    disableAllBeads: () ->
+        for b in @allBeads
+            do (b) ->
+                b.unBindHandler('dblclick')
+                b.unBindHandler('click')
+        for b in @templateBeads
+            do (b) ->
+                b.unBindHandler('dblclick')
+                b.unBindHandler('click')
+
 
     # addBead adds an use element to the allBeads area, and displays it.
     #

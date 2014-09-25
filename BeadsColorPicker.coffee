@@ -26,7 +26,7 @@ class caleidoscoop.BeadsColorPicker
 
     disable: () ->
         @elm.style.display = 'none'
-        @bead.disableColorBead(@colorIcon)
+        @bead.disableColorBead(@colorIcon) if @bead
 
 
     _addHtmlEventListener: (element, event, listener) ->

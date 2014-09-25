@@ -51,6 +51,7 @@ class caleidoscoop.EditorBeadFactory
     copyBeadFromTemplateBead: (b, editor) ->
         templateGroupPosition = editor.templateGroupPosition
         _b = @_copyBead(b, templateGroupPosition.x + b.positionX, templateGroupPosition.y + b.positionY, editor)
+        editor.disableAllBeads()
         _b.bindHandler('mousemove', _b.dragBead)
         _b.bindHandler('click', _b.releaseBead)
 
