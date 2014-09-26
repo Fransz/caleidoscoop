@@ -4,7 +4,50 @@ body {
 }
 
 #canvas {
+    position: relative;
+    top: 100px;
     margin:0 auto;
-    padding:100px 0 0 0;
-    width: 600px;
+    width: 800px;
+    height: 600px;
+}
+
+#colorpicker {
+    position: absolute;
+    left: 250px;
+    top: 250px;
+    width: 208px;
+
+    background:black;
+
+    display:none;
+}
+
+#colorpicker #slider {
+    border:2px solid green;
+    float:left;
+    width: 20px;
+    height: 200px;
+    margin-right:20px;
+}
+
+
+#colorpicker #picker {
+    border:2px solid green;
+    float:left;
+    width: 160px;
+    height: 200px;
+}
+
+#colorpicker #colorpickerbuttons {
+    clear:both;
+    width:200px;
+    height:30px;
+    padding:10px 0px;
+}
+
+#colorpicker #colorpickerbuttons #preview {
+    display:inline-block;
+    border:1px solid green;
+    width:100px;
+    background-color: hsb(0.7358655536081642,.75, .75);
 }
